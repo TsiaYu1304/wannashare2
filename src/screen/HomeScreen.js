@@ -15,20 +15,54 @@ const HomeScreen = ({navigation}) =>{
 
     const {userState} = useContext(StoreContext);
     const [user,setUser] = userState;
+    const [PersonalshareData,setFoodData] = useState("");
 
     const [lottiepath,setPath] = useState("../json/personal_store.json");
     const [name,setName] = useState(null);
+    const [saler, setSaler] = useState(true);
+    
     useEffect(()=>{
-    storefirebaseauth();
+    readData();
     },[]);
+
+    const readData = () => {
+        console.log('切換');
+        const FoodDetail = [];
+        
+            firebase.database().ref("Orders").once('value', function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    FoodDetail.push({
+                        food:childSnapshot.val().food,
+                        name:childSnapshot.val().name,
+                        SellerPhoto:childSnapshot.val().SellerPhoto,
+                        img:childSnapshot.val().img,
+                        foodDetail:childSnapshot.val().foodDetail,
+                        number:childSnapshot.val().number,
+                        date:childSnapshot.val().date,
+                        orderID:childSnapshot.val().orderID,
+                        sellerUID:childSnapshot.val().sellerUID,
+                        price:childSnapshot.val().price
+                    });
+                });
+            });
+
+            
+
+
+
+        setFoodData(FoodDetail);
+  
+  
+    };
+   
 
     const Lottieanim = () => {
         return saler?(
             <LottieView
-                    source={require("../json/store_personal.json")}
-                    loop={false}
-                    speed={1}
-                    />
+            source={require("../json/store_personal.json")}
+            loop={false}
+            speed={1}
+            />
             
             
         ):(
@@ -43,21 +77,24 @@ const HomeScreen = ({navigation}) =>{
     const storefirebaseauth = () => {
        
         firebase.auth().signInWithEmailAndPassword(user.email, user.password);
-        //setUser({...user,name:firebase.auth().currentUser.displayName})
+        setUser({...user,name:firebase.auth().currentUser.displayName})
         
     };
 
-    const [saler, setSaler] = useState(true);
+    
     const changesaler = () => {
+        //readData();
     if(saler===true){
         setPath("../json/personal_store.json");
         setSaler(false);
+        
         <Lottieanim/>
         
 
     }
     else{
         setSaler(true);
+        
         setPath("../json/store_personal.json");
     }
     }
@@ -78,19 +115,19 @@ const HomeScreen = ({navigation}) =>{
         />
     ) :(
         <FlatList
-            data = { ShopFooddata}
+            data = { PersonalshareData}
             renderItem = {({item})=>
             <Foodcard
             post = {item}
             navigation = {navigation}
             />}
-            keyExtractor = {item => item.name}
-            contentContainerStyle={{overflow: 'hidden'}}
+            keyExtractor = {item => item.orderID}
+            
         />
     )
     }
     return (
-        <View style={{flex:1,backgroundColor:'#fff'}}>
+        <View style={{flex:1,backgroundColor:'#FDF8E1'}}>
             <ScrollView scrollEventThrottle = {16} style={{height:450}}>
             <View style={{backgroundColor:'#F0A202',height:422,paddingTop:28}}>
             <ImageBackground source={require('../img/homebg1.png')} style = {{width:375,height:422}}>

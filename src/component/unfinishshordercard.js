@@ -12,7 +12,7 @@ const unfinifhordercard = ({post, navigation}) => {
             <View style={{flexDirection:'column',marginLeft:16}}>
                 <Text>{post.name}</Text>
                 <Text style={{marginTop:8,fontSize:18}}>{post.food}</Text>
-                <Text style={{marginTop:8}}>領取期限:{post.time}前</Text>
+                <Text style={{marginTop:8}}>領取期限:{post.date}前</Text>
             </View>
             <View style={styles.btnstyle}>
                 <Button 

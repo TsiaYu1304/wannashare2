@@ -5,8 +5,8 @@ import { Image } from "react-native";
 import { PostStackNavigation, OrderStackNavigation,OrderTabNavigation ,HomeStackNavigation ,UserNavigation} from "../screen"
 import HomeScreen from "../screen/HomeScreen";
 import AddScreen from "../screen/AddScreen.js";
-
-import ImagePicker from 'react-native-image-crop-picker';
+import TakePicture from "../screen/TakePictureScreen"
+import TakepictureScreen from "../screen/TakePictureScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -52,7 +52,8 @@ const HomeTabNavigation = () => {
                     focused
                     ? <Image source={require('../icon/plus_yellow.png')} style={{height:24,width:24 }}  />
                     : <Image source={require('../icon/plus.png')} style={{height:24,width:24 }}  />
-                )
+                ),
+                tabBarVisible:false
             }} 
                />
                <Tab.Screen 

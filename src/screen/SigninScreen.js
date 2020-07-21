@@ -1,10 +1,11 @@
 import React,{useContext,useState,useEffect} from "react";
-import {View, Text, TouchableOpacity,StyleSheet,TextInput,Image, ActivityIndicator,AsyncStorage } from "react-native";
+import {View, Text, TouchableOpacity,StyleSheet,TextInput,Image, ActivityIndicator,AsyncStorage ,Dimensions} from "react-native";
 import SignupScreen from "../screen/SignupScreen";
 import {Button} from "react-native-elements";
 import * as firebase from 'firebase'; 
 import {StoreContext}from "../store/UserStore.js";
 
+var {height,width} = Dimensions.get('window');
 const ME_PERSISTENCE_KEY = "ME_PERSISTENCE_KEY";
 const HAS_SET_KEY = "HAS_SET_KEY";
 
@@ -101,20 +102,20 @@ const SigninScreen = ({navigation}) =>{
       };
 
     return (
-        <View style={{backgroundColor:'#fff',height:812}}>
+        <View style={{flex:1,backgroundColor:'#fff'}}>
             <View style={styles.headertext}>
             <Text style={{fontSize:28,color:"#675D5D",}}>登入</Text>
             </View>
 
-            <View style={{paddingTop:53, alignItems:'center'}}>
+            <View style={{marginTop:0.07*height, alignItems:'center'}}>
                 <View style={styles.emailinputsection}>
                     <Image
                     source={require('../icon/multimedia.png')}
-                    style={{height:18,width:18,marginTop:13,marginLeft:18}}
+                    style={styles.Image_icon}
                     />
                 <TextInput
                 placeholder="輸入信箱"
-                style={{marginLeft:18,color:"#F0A202"}}
+                style={{marginLeft:0.05*width,color:"#F0A202",fontSize:15}}
                 
                 value={email}
                 onChangeText={(email) =>setUser({...user,email})}
@@ -123,59 +124,48 @@ const SigninScreen = ({navigation}) =>{
                 <View style={styles.passwordinputsection}>
                     <Image
                     source={require('../icon/lock.png')}
-                    style={{height:18,width:18,marginTop:13,marginLeft:18}}
+                    style={styles.Image_icon}
                     />
                 <TextInput
                 placeholder="輸入密碼"
-                style={{marginLeft:18,color:"#F0A202"}}
+                style={{marginLeft:0.05*width,color:"#F0A202",fontSize:15}}
                 value={password}
                 onChangeText={(password) => setUser({...user,password})}
                 />
                 </View>
                 
             </View>
-            <Text style={{color:"#F0A202",marginTop:6,marginLeft:268}}>忘記密碼?</Text>
+            <Text style={{color:"#F0A202",marginTop:0.01*height,marginLeft:0.71*width}}>忘記密碼?</Text>
             <View style={styles.btnstyle}>
             {renderButton()}
-            <Text style={{ padding: 10, fontSize: 16, color: "red" }}>{error}</Text>
+            <Text style={{ padding: 0.013*width, fontSize: 16, color: "red" }}>{error}</Text>
             </View>
-            <View style={{marginTop:36 ,alignItems:'center',height:20}}>
+            <View style={{marginTop:0.08*height ,alignItems:'center',height:0.024*height}}>
                 <Text style={{color:"#675D5D"}}>其他登入</Text>
             </View>
-            <View style={{flexDirection:'row',justifyContent:'center',marginTop:40}}>
-                <TouchableOpacity >
-                    <View style={styles.anothersignin_btn}>
+            <View style={styles.btn_2_View}>
+                <TouchableOpacity style={styles.anothersignin_btn}>
+                    
                     <Image
                     source={require('../icon/brands-and-logotypes.png')}
-                    style={{height:20,width:20}}
+                    style={{height:0.053*width,width:0.053*width}}
                     />
-                    </View>
                 </TouchableOpacity>
-                <TouchableOpacity >
-                    <View style={styles.anothersignin_btn2}>
+                <TouchableOpacity style={styles.anothersignin_btn2}>
+                    
                     <Image
                     source={require('../icon/facebook.png')}
-                    style={{height:20,width:20}}
+                    style={{height:0.053*width,width:0.053*width}}
                     />
-                    </View>
                 </TouchableOpacity>
             </View>
             <View style={styles.signupsection}>
                 <Text style={{color:"#675D5D",fontSize:13}}>還沒擁有帳號?</Text>
-                <Button 
-                        buttonStyle={{
-                            backgroundColor:"#fff",
-                            height:40,
-                            marginTop:-12.5
-                            
-                        }}
-                        titleStyle={{
-                            fontSize:13,
-                            color:'#F0A202F0'
-                        }}
-                        title="註冊"
-                        onPress={() => navigation.navigate('Signup')}
-                    />
+                <TouchableOpacity  onPress={() => navigation.navigate('Signup')}>
+                    <Text
+                    style={{fontSize:13,color:'#F0A202F0'}}
+                    >註冊</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -183,66 +173,77 @@ const SigninScreen = ({navigation}) =>{
 
 const styles = StyleSheet.create({
     anothersignin_btn:{
-        width:56,
-        height:56,
+        width:0.15*width,
+        height:0.15*width,
         backgroundColor:'#fff',
-        borderRadius:28,
+        borderRadius:0.075*width,
         justifyContent:'center',
         alignItems:'center',
         shadowColor:'#c8c8c8',
         shadowOffset:{width:1,height:2},
         shadowOpacity:0.5,
-        elevation:2
+        elevation:2,
+        marginRight:0.08*width
     },
     anothersignin_btn2:{
-        width:56,
-        height:56,
-        marginLeft:50,
+        width:0.15*width,
+        height:0.15*width,
 
         backgroundColor:'#fff',
-        borderRadius:28,
+        borderRadius:0.075*width,
         justifyContent:'center',
         alignItems:'center',
         shadowColor:'#c8c8c8',
         shadowOffset:{width:1,height:2},
         shadowOpacity:0.5,
-        elevation:2
+        elevation:2,
+        marginLeft:0.08*width
     },
     headertext:{
-        marginTop:50,
-        width:328,
-        marginLeft:36
+        marginTop:0.15*height,
+        marginLeft:0.1*width
         
 
+    },
+    Image_icon:{
+        height:0.022*height,
+        width:0.05*width,
+        marginTop:0.013*height,
+        marginLeft:0.05*width
     },
     emailinputsection:{
         flexDirection:'row',
         borderWidth:1,
-        width:303,
-        height:44,
-        borderRadius:22,
+        width:0.8*width,
+        height:0.054*height,
+        borderRadius:0.059*width,
         borderColor:'#c8c8c8'
     },
     passwordinputsection:{
-        marginTop:50,
+        marginTop:0.062*height,
         flexDirection:'row',
         borderWidth:1,
-        width:303,
-        height:44,
-        borderRadius:22,
+        width:0.8*width,
+        height:0.054*height,
+        borderRadius:0.059*width,
         borderColor:'#c8c8c8'
     },
     btnstyle:{
-        width:303,
-        height:44,
-        marginLeft:36,
-        marginTop:82
+        width:0.8*width,
+        height:0.054*height,
+        marginLeft:0.096*width,
+        marginTop:0.1*height
     },
     signupsection:{
-        marginTop:36,
-        height:17,
+        marginTop:0.044*height,
+        height:0.02*height,
         flexDirection:'row',
         justifyContent:'center'
+    },
+    btn_2_View:{
+        flexDirection:'row',
+        justifyContent:'center',
+        marginTop:0.08*height
     }
 })
 

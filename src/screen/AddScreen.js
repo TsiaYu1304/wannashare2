@@ -1,53 +1,142 @@
-import React from 'react';
-import { TouchableOpacity,StyleSheet, Text, View, Image, ScrollView } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
+import React, { useState } from 'react';
+import { TouchableOpacity,StyleSheet, Text, View, Image, Dimensions, TextInput,ScrollView } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import * as firebase from 'firebase'; 
+import {nanoid} from  'nanoid/async/index.native'
+import { set } from 'react-native-reanimated';
 
-const Add = () => {
-    const TakePhoto =() =>{
-        ImagePicker.openCamera({
-            width: 300,
-            height: 400,
-            cropping: true,
-          }).then(image => {
-            console.log(image);
-          });
+var {height,width} = Dimensions.get('window');
+
+const Add = ({route,navigation}) => {
+    const [food,setFood] = useState("");
+    const [foodDetail,setFoodDetail] = useState("");
+    const [number,setNumber] = useState("");
+    const [date,setDate] = useState("");
+    const [location,setLocation] = useState("");
+    const { capturePhoto } = route.params;
+    const [id,setId] = useState("");
+    const [foodimgURL,setURL]=useState(""); 
+    const [price,setPrice] = useState("100");
+
+    async function createID () {
+        const iid = await nanoid(10);
+        console.log(`enter`);
+        console.log(`iid=${iid}`);
+        setId(iid);
     }
+
+    async function upLoadImage () {
+        const response = await fetch(capturePhoto.uri);
+        const blob = await response.blob();
+    }
+
+    const dowloadImage = async ()=> 
+    {
+        const uri = firebase.storage().ref(iid).child("foodpicture").getDownloadURL();
+        console.log(`url=${uri}`);
+    }    
+    async function addunfinishShareorder2 () {
+        const iid = await nanoid(10);
+        const response = await fetch(capturePhoto.uri);
+        const blob = await response.blob();
+        const ref = firebase.storage().ref(iid).child("foodpicture")
+        var snapshot =  ref.put(blob);
+        //blob.close();
+        const imgURL = await (await snapshot).ref.getDownloadURL();
+       
+       console.log(`iid=${iid}`);
+       console.log(`iid=${imgURL}`);
+       
+       //console.log(`URL=${firebase.storage().ref(iid).child("foodpicture").getDownloadURL()}`); 
+       
+
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").child(iid).set({
+            name:firebase.auth().currentUser.displayName,
+            food:food,
+            foodDetail:foodDetail,
+            number:number,
+            date:date,
+            img:imgURL,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:iid,
+            price:price
+          });
+
+          firebase.database().ref("Orders").child(iid).set({
+            name:firebase.auth().currentUser.displayName,
+            SellerPhoto:firebase.auth().currentUser.photoURL,
+            food:food,
+            foodDetail:foodDetail,
+            number:number,
+            date:date,
+            img:imgURL,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:iid,
+            sellerUID:firebase.auth().currentUser.uid,
+            price:price
+          });
+
+
+        
+    };
+
     return (
+        <View style={{flex:1}}>
+        <KeyboardAwareScrollView>
         <ScrollView>
             <View style={styles.add_img_box}>
-                <TouchableOpacity>
                 <Image
                     style={styles.add_img}
-                    source={require("../img/add_cookie.png")}
+                    source={{uri:capturePhoto.uri}}
                 />
-                </TouchableOpacity>
             </View>
             <View style={styles.add_text_box}>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>名稱</Text>
-                    <Text style={styles.add_text_detail_content}>蘇打餅乾</Text>
+                    <TextInput
+                    placeholder="輸入食物名稱"
+                    style={styles.add_text_detail_content}
+                    value={food}
+                    onChangeText={(food) =>setFood(food)}
+                    />
                 </View>
-                <View style={styles.add_text_detail}>
+                <View style={styles.add_text_detail2}>
                     <Text style={styles.add_text_detail_name}>說明</Text>
-                    <Text style={styles.add_text_detail_content}>前兩天買的，歡迎找我拿！</Text>
+                    <TextInput
+                    
+                    placeholder="輸入說明"
+                    style={styles.add_text_detail_content}
+                    value={foodDetail}
+                    onChangeText={(foodDetail) =>setFoodDetail(foodDetail)}
+                    />
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>期限</Text>
-                    <Text style={styles.add_text_detail_content}>2020年4月28日 23:00</Text>
+                    <TextInput
+                    placeholder="輸入期限"
+                    style={styles.add_text_detail_content}
+                    value={date}
+                    onChangeText={(date) =>setDate(date)}
+                    />
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>數量</Text>
-                    <Text style={styles.add_text_detail_content}>1</Text>
+                    <TextInput
+                    placeholder="輸入數量"
+                    style={styles.add_text_detail_content}
+                    value={number}
+                    onChangeText={(number) =>setNumber(number)}
+                    />
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>地點</Text>
                     <View style={styles.add_text_detail_content}>
                         <View style={styles.add_text_detail_content_button}>
                             <Image
-                            style={{width:16,height:16}}
+                            style={{width:0.043*width,height:0.043*width}}
                             source={require('../img/pin.png')}
                             />
-                            <Text style={{paddingLeft:8,fontSize:14}}>設定地點</Text>
+                            <Text style={{paddingLeft:0.021*width,fontSize:14}}>設定地點</Text>
                         </View>
                     </View>
                 </View>
@@ -55,86 +144,97 @@ const Add = () => {
                     <Text
                         style={
                             {
-                                height: 44,
-                                width: 375,
-                                //backgroundColor: 'pink',
-                                paddingLeft: 26,
-                                paddingTop: 11,
+                                paddingLeft: 0.11*width,
                                 fontSize: 17,
                             }
                         }>台北市大安區和平東路2段360號</Text>
                 </View>
+                
+                <TouchableOpacity 
+                    onPress={()=>addunfinishShareorder2()}
+                    style={styles.share_btn}
+                    activeOpacity={0.5}
+                    >
+                    <Text style={{color:'#fff',fontSize:22}}>分享</Text>
+                </TouchableOpacity>
+               
 
             </View>
 
         </ScrollView>
+        </KeyboardAwareScrollView>
+        </View>
 
     );
 }
 
 const styles = StyleSheet.create({
     add_img_box: {
-        width: 323,
-        height: 323,
+        width: width,
+        height: 0.4*height,
         shadowColor: "#000",
         shadowOffset: { width: 3, height: 3 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
-        top: 52,
-        left: 26,
-        borderRadius: 20,
-        zIndex: 10,
+        borderRadius: 20
 
     },
     add_text_box: {
-        width: 375,
-        height: 400,
+        width: width,
         backgroundColor: '#fff',
-        top: -50,
         shadowColor: "#000",
         shadowOffset: { width: 3, height: 3 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
-        borderRadius: 20,
+        borderRadius: 25,
+        bottom:0.018*height,
+        paddingTop:0.05*height,
+        flex:1,
+        height:height*0.51
     },
     add_img: {
-        width: 323,
-        height: 323,
-        borderRadius: 20,
+        width: width,
+        height: 0.4*height
 
     },
     add_text_detail: {
-        height: 44,
-        width: 375,
-        // backgroundColor: 'red',
-        top: 128,
+        width:width,
         flexDirection: "row",
-        justifyContent: "flex-start"
+        justifyContent: "flex-start",
+        marginTop:0.027*height
+        
+    },
+    add_text_detail2: {
+        width:width,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        marginTop:0.027*height,
+        height:0.07*height
+        
     },
     add_text_detail_name: {
-        height: 44,
-        width: 120,
-        //backgroundColor: 'pink',
-        paddingLeft: 26,
-        paddingTop: 11,
+        paddingLeft: 0.11*width,
         fontSize: 17,
     },
     add_text_detail_content: {
-        height: 44,
-        width: 255,
-        //backgroundColor: 'green',
+        width:width*0.45,
+        marginLeft:0.23*width,
         fontSize: 17,
-        paddingTop: 11,
-        flexDirection: "row",
-        justifyContent: "flex-end",
+        alignSelf:'flex-start'
+        
+        
     },
     add_text_detail_content_button:{
-        height: 44,
-        width:120,
-        //backgroundColor:'tomato',
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        paddingRight:16,
+        flexDirection: "row"
+    },
+    share_btn:{
+        position:'absolute',
+        alignSelf:'flex-end',
+        height:0.064*height,
+        backgroundColor:"#F0A202F0",
+        alignItems:'center',
+        justifyContent:'center',
+        marginTop:0.04*height
     }
 
 });

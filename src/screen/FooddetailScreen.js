@@ -16,34 +16,53 @@ const FooddetailScreen = ({route,navigation}) =>{
     const [useruid, setUid] = useState("");
     const { name } = route.params;
     const { food } = route.params;
-    const { userphoto } = route.params;
+    const { SellerPhoto } = route.params;
     const { img } = route.params;
+    const { foodDetail } = route.params;
+    const { orderID } = route.params;
+    const { date } = route.params;
+    const { number } = route.params;
+    const { sellerUID } = route.params;
+    const { price } = route.params;
     const [showModal, setShowModal] = useState(false);
     const onCLoseModal = () => {
         setShowModal(false);
     };
+    
+    function addunfinishorder() { //下單
 
 
-
-    function addunfinishorder() {
-        /*db.collection("Users").doc(Auth.currentUser.uid).collection("order").doc("Buy").collection("unfinish").doc(food).set({
+        //領取者 “買訂單” “未完成”
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").child(orderID).set({
             name:name,
             food:food,
-            userphoto:userphoto,
-            img:img
-          });*/
-        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").child(food).set({
-            name:name,
-            food:food,
-            userphoto:userphoto,
-            img:img
+            foodDetail:foodDetail,
+            SellerPhoto:SellerPhoto,
+            img:img,
+            date:date,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:orderID,
+            price:price
           });
-        /*firebase.database().ref(firebase.auth().currentUser.uid).set({
-          name:name,
-          food:food,
-          userphoto:userphoto,
-          img:img
-        });*/
+
+          //分享者 “分享訂單” “完成：未完成”
+
+          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("finish").child(orderID).set({
+            name:name,
+            food:food,
+            foodDetail:foodDetail,
+            Buyerphoto:firebase.auth().currentUser.photoURL,
+            price:price,
+            BuyerID:firebase.auth().currentUser.uid,
+            img:img,
+            date:date,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:orderID,
+            finish:false
+          });
+
+          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("unfinish").child(orderID).remove();
+          firebase.database().ref("Orders").child(orderID).remove();
       }
 
     const AcceptOrder = () => {
@@ -106,7 +125,7 @@ const FooddetailScreen = ({route,navigation}) =>{
             <View style={styles.detailView}> 
             <View style={styles.SellerSection}>
                 <Image
-                    source={{uri:userphoto}}
+                    source={{uri:SellerPhoto}}
                     style={styles.Userphoto}
                 />
                 <View style={{marginLeft:8}}>
@@ -120,7 +139,7 @@ const FooddetailScreen = ({route,navigation}) =>{
                         source={require('../icon/pricetag.png')}
                         style={{height:26,width:26,marginTop:-2}}
                     />
-                    <Text style={{fontSize:18,color:'#949494'}}>{fooddata[0].price}</Text>
+                    <Text style={{fontSize:18,color:'#949494'}}>{price}</Text>
                 </View>
             </View>
             <View style={styles.Twobutton}>
@@ -157,15 +176,15 @@ const FooddetailScreen = ({route,navigation}) =>{
             <View >
                 <View style={styles.FooddetailList}>
                     <Text style={{fontSize:14}}>說明</Text>
-                    <Text style={{fontSize:14 ,marginLeft:32}}>2天前買的吐司、還有3、4片</Text>
+                        <Text style={{fontSize:14 ,marginLeft:32}}>{foodDetail}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={{fontSize:14}}>期限</Text>
-                    <Text style={{fontSize:14 ,marginLeft:32}}>4天</Text>
+                        <Text style={{fontSize:14 ,marginLeft:32}}>{date}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={{fontSize:14}}>數量</Text>
-                    <Text style={{fontSize:14 ,marginLeft:32}}>1</Text>
+                        <Text style={{fontSize:14 ,marginLeft:32}}>{number}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={{fontSize:14}}>地點</Text>

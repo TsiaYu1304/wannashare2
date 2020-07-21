@@ -18,23 +18,17 @@ export const StoreProvider = ({children}) => {
     };
     
     const LoginrestoreState = async () => {
-
-       
-
         try{
-           
-            AsyncStorage.getItem(SIGN_PERSISTENCE_KEY, (err, value) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    setIsLogin(value);
-                    console.log(`store get async ${isLogin}`);
-                     // boolean false
-                }
-            })
-            
+            const login_hasSetString = await AsyncStorage.getItem(SIGN_HAS_SET_KEY);
+            const login_hasSet = JSON.parse(login_hasSetString);
+            if(login_hasSet){
+                const loginbool = await AsyncStorage.getItem(SIGN_PERSISTENCE_KEY);
+                const state_login = JSON.parse(loginbool);
+                setIsLogin(state_login);
+            }
+            console.log();
         
-        }catch(e) { console.log(`store err ${e}`);}
+        }catch(e) {}
     };
 
 
@@ -46,6 +40,7 @@ export const StoreProvider = ({children}) => {
                 const userString = await AsyncStorage.getItem(ME_PERSISTENCE_KEY);
                 const state_user = JSON.parse(userString);
                 setUser(state_user);
+                console.log(`store user =${user.email} ${user.password} ${user.name}`);
             }
         
         }catch(e) {}
@@ -57,7 +52,7 @@ export const StoreProvider = ({children}) => {
 
     useEffect(()=>{
         LoginrestoreState();
-    },[isLogin]);
+    },[]);
 
     return(
         <StoreContext.Provider value={store}> 
@@ -65,4 +60,3 @@ export const StoreProvider = ({children}) => {
         </StoreContext.Provider> //value要傳遞給childrean
     );
 };
-

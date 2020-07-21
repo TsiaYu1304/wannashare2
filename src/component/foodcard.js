@@ -8,16 +8,24 @@ const foodcard = ({post, navigation}) => {
             <TouchableOpacity
             onPress={() => navigation.navigate('Food',{
                 name:post.name,
+                SellerPhoto:post.SellerPhoto,
                 food:post.food,
                 userphoto:post.userphoto,
                 img:post.img,
+                number:post.number,
+                foodDetail:post.foodDetail,
+                orderID:post.orderID,
+                date:post.date,
+                sellerUID:post.sellerUID,
+                price:post.price
+
 
                 
               })}>
         <View style={styles.cardview}>
             <View   style={{flexDirection:'row'}}>
                 <Image
-                source={{uri:post.userphoto}}
+                source={{uri:post.SellerPhoto}}
                 style={styles.userphoto}
                 />
                 <Text style={{fontSize:14,marginLeft:8,color:'#656565'}}>{post.name}</Text>

@@ -1,20 +1,32 @@
 import React,{useContext, useState,useEffect}from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground ,TouchableOpacity,Dimensions,FlatList,ScrollView} from 'react-native';
+import { ActionSheetIOS,StyleSheet, Text, View, Image, ImageBackground ,TouchableOpacity,Dimensions,FlatList,ScrollView} from 'react-native';
 import { OrderTabNavigation} from "./index"
 import {Button} from "react-native-elements";
 import {StoreContext}from "../store/UserStore.js";
-import SegmentedControlTab from 'react-native-segmented-control-tab'
 import { TabView, SceneMap ,TabBar} from 'react-native-tab-view';
 import * as firebase from 'firebase'; 
 import fakefoodfata from "../json/fooddetail.json"
+import * as ImagePicker  from 'expo-image-picker'
+
 
 
 
 const Foodcard = ({post, navigation}) => {
     return(
-        <View style={{height:113 ,borderColor:'#000',
-        borderWidth:1}}>
-        <TouchableOpacity >
+        <View style={{height:113 }}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('OrderDetail',{
+                food:post.food,
+                name:post.name,
+                img:post.img,
+                SellerPhoto:post.SellerPhoto,
+                foodDetail:post.foodDetail,
+                date:post.date,
+                time:post.time,
+                orderID:post.orderID  
+
+              })}
+        >
         <View style={{flexDirection:'row',marginTop:25}}>
             <Image
             source={{uri:post.img}}
@@ -23,7 +35,7 @@ const Foodcard = ({post, navigation}) => {
             <View style={{flexDirection:'column',marginTop:5,marginLeft:16}}>
                 <Text>{post.name}</Text>
                 <Text style={{fontSize:18,marginTop:8}}>{post.food}</Text>            
-                <Text style={{marginTop:8}}>領取期限:4/27 17:00前</Text>
+                <Text style={{marginTop:8}}>領取期限:{post.date}前</Text>
             </View>
             <View>
                 <Button
@@ -45,7 +57,7 @@ const Foodcard = ({post, navigation}) => {
   
   
 const User = ({navigation}) => {
-
+    const [finifoodData,setFinifoodData] = useState([]);
     const [foodData,setFoodData] = useState([]);
     const {userState} = useContext(StoreContext);
     const [user,setUser] = userState;
@@ -56,6 +68,32 @@ const User = ({navigation}) => {
     { key: 'first', title: '尚未領取' },
     { key: 'second', title: '已領取' },
   ]);
+
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+
+    const response = await fetch(pickerResult.uri);
+    const blob = await response.blob();
+    const ref = firebase.storage().ref(firebase.auth().currentUser.uid)
+    var snapshot =  ref.put(blob);
+    const imgURL = await (await snapshot).ref.getDownloadURL();
+
+    await firebase.auth().currentUser.updateProfile({
+        photoURL:imgURL
+    })
+
+  };
+
+
+
+
   const FirstRoute = () => (
     Orderexist?(
         <FlatList
@@ -67,35 +105,9 @@ const User = ({navigation}) => {
             />}
             keyExtractor = {item => item.name}
         />
-        /*<View>
-        <TouchableOpacity>
-        <View style={{flexDirection:'row',height:88,marginTop:25}}>
-            <Image
-            source={{uri:img}}
-            style={{height:88,width:88,borderRadius:10,marginLeft:26}}
-            />
-            <View style={{flexDirection:'column',marginTop:5,marginLeft:16}}>
-                <Text>{salername}</Text>
-                <Text style={{fontSize:18,marginTop:8}}>{food}</Text>            
-                <Text style={{marginTop:8}}>領取期限:4/27 17:00前</Text>
-            </View>
-            <View>
-                <Button
-                title="聯絡他"
-                buttonStyle={{backgroundColor:'#F0A202',borderRadius:10,height:36,width:82}}
-                titleStyle={{fontSize:14}}
-                />
-            </View>
-
-        </View>
-        </TouchableOpacity>
         
-    </View>*/
-    
     ):(
-    <View>
-        <Text>NONO</Text>
-    </View>
+    <View></View>
     )
     
   );
@@ -120,9 +132,9 @@ const User = ({navigation}) => {
         second: SecondRoute,
         
       });
-/*
-    const [email,setEmail] = useState(null);
-    const [name,setName] = useState(null);*/
+
+
+
     useEffect(()=>{
         storefirebaseauth();
         },[]);
@@ -130,42 +142,70 @@ const User = ({navigation}) => {
             firebase.auth().signInWithEmailAndPassword(user.email, user.password);
             setUser({...user,email:firebase.auth().currentUser.email})
             setUser({...user,name:firebase.auth().currentUser.displayName})
-            
+            setUser({...user,userphoto:firebase.auth().currentUser.photoURL})
+            console.log(`user photoURL=${user.email}`);
         };
   
-
-    const [food,setFood] = useState("");
-    const [salername,setSalername] = useState("");
-    const [img,setImg] = useState("");
     useEffect(()=>{
     readData();
     },[]);
-    const readData = () => {
+    const readData = async () => {
         const FoodDetail = [];
         
-        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
+        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 FoodDetail.push({
                     food:childSnapshot.val().food,
                     name:childSnapshot.val().name,
                     img:childSnapshot.val().img,
-                    userphoto:childSnapshot.val().userphoto
-                    
+                    SellerPhoto:childSnapshot.val().SellerPhoto,
+                    foodDetail:childSnapshot.val().foodDetail,
+                    date:childSnapshot.val().date,
+                    time:childSnapshot.val().time,
+                    orderID:childSnapshot.val().orderID,
+                    price:childSnapshot.val().price   
                 });
-                console.log(`child name=${childSnapshot.val().name}`);
-                console.log(`child food=${childSnapshot.val().food}`);
-               
-                
-               // console.log(`img=${childSnapshot.val().name}`);
               });
             });
 
-        setOrder(true);
+        
         setFoodData(FoodDetail);
-  
+
+        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                finifoodData.push({
+                    food:childSnapshot.val().food,
+                    name:childSnapshot.val().name,
+                    img:childSnapshot.val().img,
+                    SellerPhoto:childSnapshot.val().SellerPhoto,
+                    foodDetail:childSnapshot.val().foodDetail,
+                    date:childSnapshot.val().date,
+                    time:childSnapshot.val().time,
+                    orderID:childSnapshot.val().orderID         
+                });
+              });
+            });
+            
+        setFinifoodData(finifoodData);
+
+        setOrder(true);
   
     };
 
+    const onPress = () =>
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["取消", "打開相簿","打開相機"],
+        cancelButtonIndex: 0
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else if (buttonIndex === 1) {
+          openImagePickerAsync();
+        }
+      }
+    );
 
  
 
@@ -180,11 +220,12 @@ const User = ({navigation}) => {
                     source={require("../img/userbg.png")}
                 >
                     <View style={{height:162,alignItems:'center'}}>
+                    <TouchableOpacity onLongPress={onPress}>
                     <Image
                         style={styles.user_profile_img_}
-                        source={require("../img/user_tomato.png")}
+                        source={{uri:user.userphoto}}
                     />
-                    
+                    </TouchableOpacity>
     <Text style={styles.user_profile_name}>{user.name}</Text>
     <Text style={styles.user_profile_mail}>{user.email}</Text>
                     </View>
@@ -265,6 +306,7 @@ const User = ({navigation}) => {
             />
             
             </ScrollView>
+            
         </View>
     );
 }

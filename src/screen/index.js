@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
+import TakePicture from "../screen/TakePictureScreen";
 import SigninScreen from "./SigninScreen";
 import SignupScreen from "./SignupScreen";
 import HomeTabNavigation from "../navigations/MainTab.js";
@@ -21,6 +22,9 @@ import ICanUse from "../screen/coinScreen";
 import Coupon from "../screen/couponScreen";
 import Chat from "../screen/chatScreen";
 import intro from "../screen/GuideScreen";
+import OrderDetailscreen from "./orderDetailScreen";
+import SellerDetailScreen from "./SellerOrderDetail"
+
 
 
 
@@ -63,7 +67,6 @@ export const HomeStackTabNavigation = ({navigation}) => {
                     backgroundColor:"#F0A202F0",
                     height:88
                 },
-                headerBackTitleVisible:false,
                 title:'吐司',
                 
                
@@ -71,10 +74,20 @@ export const HomeStackTabNavigation = ({navigation}) => {
             }}/>
             <Stack.Screen name="Coin" component={ICanUse} options={{title:"想享幣",headerShown: false}} />
             <Stack.Screen name="Setting" component = {setting} options={{
-                title:'設定'
+                title:'設定',
+                headerTitleStyle:{color:'#fff'},
+                headerStyle:{
+                    backgroundColor:"#F0A202F0",
+                    height:88
+                },
+                headerBackTitleVisible:false,
+                headerTintColor:'#fff'
+                
             }}/>
             <Stack.Screen name="Coupon" component={Coupon} options={{title:"優惠券",headerShown: false}} />
             <Stack.Screen name="Chat" component={Chat} options={{title:"聊天",headerShown: false}} />
+            <Stack.Screen name="OrderDetail" component={OrderDetailscreen} options={{title:"詳細資訊",headerShown: false}} />
+            <Stack.Screen name="SellerOrderDetail" component={SellerDetailScreen} options={{title:"詳細",headerShown: false}} />
         </Stack.Navigator>
     );
 };
@@ -90,7 +103,7 @@ export const HomeStackNavigation = ({navigation}) => {
 
 const AddRightHeader =()=>{
     return(
-    <Text style={{marginRight:16,color:'#fff'}}>分享</Text>
+    <Text style={{marginRight:18,color:'#fff'}}>分享</Text>
     )
 }
 
@@ -101,6 +114,21 @@ export const PostStackNavigation = ({navigation}) => {
     
     return(
         <Stack.Navigator>
+            <Stack.Screen name="TakePicture" component={TakePicture}
+            options={{
+                title:'拍照',
+                headerStyle:{
+                    backgroundColor:'#F0A202F0',
+                
+                },
+                headerTitleStyle:{
+                    color:'#fff'
+                },
+                headerBackTitleVisible:true,
+                headerBackTitle:'取消',
+                headerShown: false
+            }}
+            />
             <Stack.Screen name="Add" component = {AddScreen}
            
             options={{
@@ -112,7 +140,9 @@ export const PostStackNavigation = ({navigation}) => {
                 headerTitleStyle:{
                     color:'#fff'
                 },
-                headerRight:()=>(<AddRightHeader/>)
+                headerRight:()=>(<AddRightHeader/>),
+                headerBackTitleVisible:false,
+                headerTintColor:'#fff'
             }}
             />
         </Stack.Navigator>
@@ -123,11 +153,10 @@ export const OrderStackNavigation = ({navigation}) => {
     return(
         <Stack.Navigator>
             <Stack.Screen name="Order" component = {OrderTabNavigation} options={{
-                title:'我的訂單',
+                title:'我的分享',
                 headerStyle:{
                     backgroundColor:"#F0A202F0",
-                    height:88,
-                    color:'#fff'
+                    height:88
                 },
                 headerTitleStyle:{
                     color:'#fff'
