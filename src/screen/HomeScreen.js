@@ -1,5 +1,5 @@
 import React ,{useState,useEffect,useContext}from "react";
-import {View, Text, FlatList, Button, TextInput ,Image,ScrollView,StyleSheet,ImageBackground} from "react-native"
+import {View, Text, FlatList, Button, TextInput ,Image,ScrollView,StyleSheet,ImageBackground,Dimensions,PixelRatio} from "react-native"
 import Shopdetail from "../json/Shopdetail.json"
 import Fooddata from "../json/fooddetail.json"
 import ShopFooddata from "../json/shopfooddetail.json"
@@ -8,21 +8,27 @@ import * as firebase from 'firebase';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import LottieView from "lottie-react-native";
 import {StoreContext}from "../store/UserStore.js";
+import "../component/ScreenUtil.js"
+import { setSptext, scaleSize, setheight, setWidth } from "../component/ScreenUtil.js";
+
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
 
 //let Auth = firebase.auth();
  
 const HomeScreen = ({navigation}) =>{
+    const [name,setName] = useState("");
 
     const {userState} = useContext(StoreContext);
     const [user,setUser] = userState;
     const [PersonalshareData,setFoodData] = useState("");
 
     const [lottiepath,setPath] = useState("../json/personal_store.json");
-    const [name,setName] = useState(null);
     const [saler, setSaler] = useState(true);
     
     useEffect(()=>{
     readData();
+    setName(firebase.auth().currentUser.displayName);
     },[]);
 
     const readData = () => {
@@ -74,13 +80,6 @@ const HomeScreen = ({navigation}) =>{
         )
     }
 
-    const storefirebaseauth = () => {
-       
-        firebase.auth().signInWithEmailAndPassword(user.email, user.password);
-        setUser({...user,name:firebase.auth().currentUser.displayName})
-        
-    };
-
     
     const changesaler = () => {
         //readData();
@@ -128,19 +127,19 @@ const HomeScreen = ({navigation}) =>{
     }
     return (
         <View style={{flex:1,backgroundColor:'#FDF8E1'}}>
-            <ScrollView scrollEventThrottle = {16} style={{height:450}}>
-            <View style={{backgroundColor:'#F0A202',height:422,paddingTop:28}}>
-            <ImageBackground source={require('../img/homebg1.png')} style = {{width:375,height:422}}>
-                <View style={{height:91,paddingTop:17,paddingLeft:26}}>
-                <Text style={{color:'#fff',fontSize:22}}>Hello,{user.name}!</Text>
-                    <Text style={{color:'#fff',fontSize:14,marginTop:8}}>歡迎使用想享!</Text>
+            <ScrollView>
+            <View style={styles.Top_section}>
+            <ImageBackground source={require('../img/homebg1.png')} style = {{width:setWidth(375),height:setheight(325)}}>
+                <View style={{height:0.112*deviceheight,paddingTop:setheight(22),paddingLeft:0.07*devicewidth}}>
+                <Text style={{color:'#fff',fontSize:setSptext(22)}}>Hello,{name}!</Text>
+                    <Text style={{color:'#fff',fontSize:setSptext(14),marginTop:0.001*deviceheight}}>歡迎使用想享!</Text>
                 </View>
-                <View style={{flexDirection:'row'}}>
+                <View style={{flexDirection:'row',justifyContent:'center'}}>
                    
                     <View style = {styles.Searchsection}>
                     <Image
                     source={require('../icon/search.png')}
-                    style={{width:12,height:12,marginTop:12,marginLeft:12,marginRight:12}}
+                    style={styles.search_icon}
                     />
                     <TextInput
                     placeholder="找食物"
@@ -150,7 +149,7 @@ const HomeScreen = ({navigation}) =>{
                 </View>
             
                 <View style={styles.RowScrollsection}>
-                    <View style={{alignItems:"center",paddingTop:16}}>
+                    <View style={{alignItems:"center",height:setheight(56),justifyContent:'center'}}>
                     <Text style={styles.ScrollText}>精選商家</Text>
                     </View>
                     <View >
@@ -195,7 +194,7 @@ const HomeScreen = ({navigation}) =>{
             <View style={styles.near_View}>
                 <Text style={styles.FlatListtext}>離你最近</Text>
                 <TouchableOpacity
-                style={{marginLeft:135,width:120,height:30}}
+                style={styles.switch_btn}
                 onPress={changesaler}
                 >
                 <Lottieanim/>
@@ -210,48 +209,54 @@ const HomeScreen = ({navigation}) =>{
 };
 
 const styles = StyleSheet.create({
+    Top_section:{
+        backgroundColor:'#F0A202',
+        height:setheight(325),
+        paddingTop:setheight(44)
+    },
+    search_icon:{
+        width:0.032*devicewidth,
+        height:0.032*devicewidth,
+        marginTop:0.032*devicewidth,
+        marginLeft:0.032*devicewidth,
+        marginRight:0.032*devicewidth
+    },
     near_View:{
-        height:80,
-        marginTop:28,
-        paddingTop:26,
+        height:setheight(56),
+        marginTop:setheight(138),
         backgroundColor:'#FDF8E1',
         flexDirection:'row'
     },
     Searchsection:{
-        flex:1,
+        width:0.86*devicewidth,
         fontWeight:"700",
         backgroundColor:'#F6C45D',
-        width:1,
-        height:36,
-        marginLeft:26,
-        marginRight:26,
+        height:0.044*deviceheight,
         flexDirection:'row',
         borderRadius:10
     },
-    Searchinput:{},
     RowScrollsection:{
         flex:1,
         
     },
     FlatListtext:{
-        fontSize:18,
+        fontSize:setSptext(18),
         fontWeight:'600',
         color:'#F0A202',
-        marginLeft:26,
+        marginLeft:0.07*devicewidth,
     },
     ScrollText:{
-        fontSize:18,
+        fontSize:setSptext(18),
         fontWeight:'600',
-        color:'#fff',
-        height:40,
+        color:'#fff'
         
     },
     Scrollcard:{
-        height:192,
-        width:278,
-        marginRight:16,
+        height:setheight(192),
+        width:setWidth(278),
+        marginRight:0.04*devicewidth,
         shadowColor:"#9A9A9A",
-        elevation:24,
+        //elevation:24,
         shadowOffset:{width:5,height:5},
         shadowOpacity:0.4,
 
@@ -259,23 +264,32 @@ const styles = StyleSheet.create({
     },
     shopimage:{
         flex:1,
-        width:278,
-        height:192,
+        width:setWidth(278),
+        height:setheight(192),
         resizeMode:'cover',
         borderRadius:10
         
     },
     shopname:{
-        bottom:30,
+        bottom:0.037*deviceheight,
         color:'white',
-        marginLeft:16,
-        fontSize:18
+        marginLeft:0.04*devicewidth,
+        fontSize:setSptext(18)
 
     },
     scrollsection:{
-        marginTop:20,
-        paddingLeft:48,
+        paddingLeft:0.128*devicewidth,
         
+    },
+    switch_btn:{
+        marginLeft:setWidth(135),
+        width:setWidth(118),
+        height:setheight(28),
+        shadowColor:"#F0A20280",
+        shadowOffset:{width:4,height:2},
+        shadowOpacity:0.5,
+        shadowRadius:3
+
     }
 
 })

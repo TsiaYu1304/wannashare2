@@ -23,7 +23,9 @@ import Coupon from "../screen/couponScreen";
 import Chat from "../screen/chatScreen";
 import intro from "../screen/GuideScreen";
 import OrderDetailscreen from "./orderDetailScreen";
-import SellerDetailScreen from "./SellerOrderDetail"
+import SellerDetailScreen from "./SellerOrderDetail";
+import chatroomScreen from "./ChatroomScreen"
+import ChatroomScreen from "./ChatroomScreen";
 
 
 
@@ -86,6 +88,7 @@ export const HomeStackTabNavigation = ({navigation}) => {
             }}/>
             <Stack.Screen name="Coupon" component={Coupon} options={{title:"優惠券",headerShown: false}} />
             <Stack.Screen name="Chat" component={Chat} options={{title:"聊天",headerShown: false}} />
+            <Stack.Screen name="ChatRoom" component={ChatroomScreen} options={{title:"聊天室",headerBackTitleVisible:false}} />
             <Stack.Screen name="OrderDetail" component={OrderDetailscreen} options={{title:"詳細資訊",headerShown: false}} />
             <Stack.Screen name="SellerOrderDetail" component={SellerDetailScreen} options={{title:"詳細",headerShown: false}} />
         </Stack.Navigator>

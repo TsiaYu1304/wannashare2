@@ -39,13 +39,13 @@ const Unfinifhordercard = ({post, navigation}) => {
 const UnfinishorderScreen = ({navigation}) =>{
     const [foodData,setFoodData] = useState([]);
 
-    useEffect(()=>{
+    /*useEffect(()=>{
     safefirebaseUnfinishShareorder();
-    },[]);
-    const safefirebaseUnfinishShareorder = () => {
+    },[]);*/
+    const safefirebaseUnfinishShareorder = async () => {
         const firebaseFoodDetail = [];
         
-        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").once('value', function(snapshot) {
+        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
                 firebaseFoodDetail.push({
                     food:childSnapshot.val().food,
@@ -59,12 +59,12 @@ const UnfinishorderScreen = ({navigation}) =>{
             });
         });
 
-        
         setFoodData(firebaseFoodDetail);
         
-        
-  
     };
+    
+    safefirebaseUnfinishShareorder();
+
 
     return (
         <View style={{backgroundColor:'#fff',height:812}}>

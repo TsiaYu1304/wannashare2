@@ -1,6 +1,38 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity,Switch } from 'react-native';
 
+const ChatRoomCard = ({navigation}) =>{
+    return (
+        <TouchableOpacity onPress={()=>navigation.navigate('ChatRoom')}>
+    <View style={{
+        height: 88,
+        // backgroundColor: 'pink',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        borderBottomWidth:'1',
+        borderBottomColor:"#E1E1E1"
+    }}>
+    
+        <View style={{
+            width: 74,
+            marginLeft: 16,
+            //backgroundColor:'red'
+        }}>
+            <Image source={require('../img_yu/wang.png')}
+                style={{ width: 64, height: 64, borderRadius: 50 }} />
+        </View>
+
+        <View>
+            <Text style={{ fontSize: 18, color: "#949494" }}>王先生</Text>
+            <Text></Text>
+            <Text style={{ fontSize: 14, color: "#949494" }}>掰掰＾＾</Text>
+        </View>
+    </View>
+    </TouchableOpacity>
+
+    )}
+
 const chat = ({navigation}) => {
     return (
         <View style={{backgroundColor:'#fff',height:8850}}>
@@ -42,63 +74,33 @@ const chat = ({navigation}) => {
             {/* headerEnd-------------------------- */}
             
             <ScrollView style={{ height: 750 }}>
-                {/* chat_1Start----------------------- */}
-                <View style={{
-                    height: 88,
-                    // backgroundColor: 'pink',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    borderBottomWidth:'1',
-                    borderBottomColor:"#E1E1E1"
-                }}>
-                    <View style={{
-                        width: 74,
-                        marginLeft: 16,
-                        //backgroundColor:'red'
-                    }}>
-                        <Image source={require('../img_yu/wang.png')}
-                            style={{ width: 64, height: 64, borderRadius: 50 }} />
-                    </View>
+            <TouchableOpacity onPress={()=>navigation.navigate('ChatRoom')}>
+    <View style={{
+        height: 88,
+        // backgroundColor: 'pink',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        borderBottomWidth:'1',
+        borderBottomColor:"#E1E1E1"
+    }}>
+    
+        <View style={{
+            width: 74,
+            marginLeft: 16,
+            //backgroundColor:'red'
+        }}>
+            <Image source={require('../img_yu/wang.png')}
+                style={{ width: 64, height: 64, borderRadius: 50 }} />
+        </View>
 
-                    <View>
-                        <Text style={{ fontSize: 18, color: "#949494" }}>王先生</Text>
-                        <Text></Text>
-                        <Text style={{ fontSize: 14, color: "#949494" }}>掰掰＾＾</Text>
-                    </View>
-                </View>
-                {/* chat_1End----------------------- */}
-                {/* chat_2Start----------------------- */}
-                 <View style={{
-                    height: 88,
-                    // backgroundColor: 'pink',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    borderBottomWidth:'1',
-                    borderBottomColor:"#E1E1E1"
-                }}>
-                    <View style={{
-                        width: 74,
-                        marginLeft: 16,
-                        //backgroundColor:'red'
-                    }}>
-                        <Image source={require('../img_yu/PPro.png')}
-                            style={{ width: 64, height: 64, borderRadius: 50 }} />
-                    </View>
-
-                    <View>
-                        <Text style={{ fontSize: 18, color: "#949494" }}>阿威手感烘焙房</Text>
-                        <Text></Text>
-                        <Text style={{ fontSize: 14, color: "#949494" }}>可以喔！</Text>
-                    </View>
-                </View>
-                {/* chat_2End----------------------- */}
-                
-
-
-
-
+        <View>
+            <Text style={{ fontSize: 18, color: "#949494" }}>王先生</Text>
+            <Text></Text>
+            <Text style={{ fontSize: 14, color: "#949494" }}>掰掰＾＾</Text>
+        </View>
+    </View>
+    </TouchableOpacity>
             </ScrollView>
         </View>
     );

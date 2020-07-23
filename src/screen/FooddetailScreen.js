@@ -6,10 +6,9 @@ import { round } from "react-native-reanimated";
 import MapView,{Marker} from "react-native-maps";
 import Confirm from "../component/Confirm.js"
 import * as firebase from 'firebase'; 
-import "@firebase/firestore";
+import {nanoid} from  'nanoid/async/index.native'
 
-//let db = firebase.firestore();
-//let Auth = firebase.auth();
+
 
 const FooddetailScreen = ({route,navigation}) =>{
     
@@ -25,11 +24,114 @@ const FooddetailScreen = ({route,navigation}) =>{
     const { sellerUID } = route.params;
     const { price } = route.params;
     const [showModal, setShowModal] = useState(false);
-    const onCLoseModal = () => {
-        setShowModal(false);
+    const { Myname } = firebase.auth().currentUser.displayName;
+    const { MyUID } = firebase.auth().currentUser.uid;
+    const { MyURL } = firebase.auth().currentUser.photoURL;
+    const [Dataexist,setExist] = useState(false);
+    const [Room_ID,setRoomID] = useState("");
+
+    //建立聊天室資料庫
+    const BuildChatRoominUserData = (ID) =>{
+        //買家方增加聊天室
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Chatroom").child(ID).set({
+            RoomID:ID,
+            anotheruser:name,
+            anotheruserUID:sellerUID,
+            anotheruserURL:SellerPhoto
+        });
+        //賣加方增加聊天室
+        firebase.database().ref("Users").child(sellerUID).child("Chatroom").child(ID).set({
+            RoomID:ID,
+            anotheruser:Myname,
+            anotheruserUID:MyUID,
+            anotheruserURL:MyURL
+        });
     };
+
+    const BuildChatRoominOrderData = (ID) =>{
+        //在聊天室資料夾增加我的資料
+        firebase.database().ref("ChatRoom").child(ID).child("Users").child(Myname).set({
+            name:Myname,
+            uid:MyUID,
+            URL:MyURL
+        });
+        //firebase.database().ref("ChatRoom").child(ID).child("Users").child(Myname).off();
+        console.log("聊天室建立我的資料");
+
+        //在聊天室資料夾增加賣方資料
+        firebase.database().ref("ChatRoom").child(ID).child("Users").child(name).set({
+            name:name,
+            uid:sellerUID,
+            URL:SellerPhoto
+        });
+        //firebase.database().ref("ChatRoom").child(ID).child("Users").child(name).off();
+        console.log("聊天室建立賣家的資料");
+    };
+
+    const Chatwithseller = async () => {
+        let RoomExist = false;
+        let iid = await nanoid(10);
+        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).
+        child("Chatroom").orderByChild('anotheruser').equalTo(name).once("value",snapshot => {
+            if(snapshot.exists()){ //如果聊天室存在
+
+                snapshot.forEach(function(childSnapshot) {
+                    iid = childSnapshot.val().RoomID;  //取得RoomID
+                });
+                //setExist(true);
+                RoomExist = true;
+                console.log(iid )
+            }else{
+                RoomExist = false;
+                //setExist(false);
+                setRoomID(iid);
+                console.log("nono");
+            }
+        });
+        //console.log(`Roomid = ${Room_ID}`)
+
+        if(RoomExist){  //聊天室存在
+            //就要導到跟那個賣家聊天的畫面
+            navigation.navigate('ChatRoom',{
+                name:name,
+                SellerPhoto:SellerPhoto,
+                RoomID:iid
+            })
+        }else{
+            //console.log(`Myname = ${firebase.auth().currentUser.displayName}`)
+            firebase.database().ref("ChatRoom").child(iid).child(firebase.auth().currentUser.displayName).set({
+                name:firebase.auth().currentUser.displayName,
+                uid:firebase.auth().currentUser.uid,
+                URL:firebase.auth().currentUser.photoURL
+            });
+            firebase.database().ref("ChatRoom").child(iid).child(name).set({
+                name:name,
+                uid:sellerUID,
+                URL:SellerPhoto
+            });
+            firebase.database().ref("Users").child(sellerUID).child("Chatroom").child(iid).set({
+                RoomID:iid,
+                anotheruser:firebase.auth().currentUser.displayName,
+                anotheruserUID:firebase.auth().currentUser.uid,
+                anotheruserURL:firebase.auth().currentUser.photoURL
+            });
+            firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Chatroom").child(iid).set({
+                RoomID:iid,
+                anotheruser:name,
+                anotheruserUID:sellerUID,
+                anotheruserURL:SellerPhoto
+            });
+
+            navigation.navigate('ChatRoom',{
+                name:name,
+                SellerPhoto:SellerPhoto,
+                RoomID:iid
+            })
+        }
+    }
+
     
-    function addunfinishorder() { //下單
+    function addunfinishorder() { //下單建立訂單資料庫
 
 
         //領取者 “買訂單” “未完成”
@@ -65,16 +167,19 @@ const FooddetailScreen = ({route,navigation}) =>{
           firebase.database().ref("Orders").child(orderID).remove();
       }
 
-    const AcceptOrder = () => {
+    const AcceptOrder = () => { //確認下單
         addunfinishorder();
         setShowModal(false);
 
         
     };
-    const onOpenModal = () => {
+    const onOpenModal = () => { //按我要下單
         setShowModal(true);
       }
-    
+      
+      const onCLoseModal = () => {
+        setShowModal(false);
+    };
 
     const [region,setRegion] = useState({
         longitude: 121.544637,
@@ -143,7 +248,7 @@ const FooddetailScreen = ({route,navigation}) =>{
                 </View>
             </View>
             <View style={styles.Twobutton}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={Chatwithseller}>
                     <View style={styles.btn}>
                         <Image
                         source={require('../icon/chat2x.png')}
