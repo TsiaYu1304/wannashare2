@@ -78,7 +78,8 @@ const Add = ({route,navigation}) => {
             price:price
           });
 
-
+          navigation.goBack();  
+          navigation.navigate('HomePage');  
 
         
     };
