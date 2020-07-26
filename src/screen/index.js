@@ -26,6 +26,7 @@ import OrderDetailscreen from "./orderDetailScreen";
 import SellerDetailScreen from "./SellerOrderDetail";
 import chatroomScreen from "./ChatroomScreen"
 import ChatroomScreen from "./ChatroomScreen";
+import FoodShopScreen from "./foodshopscreen"
 
 
 
@@ -182,9 +183,13 @@ export const OrderTabNavigation = ({navigation}) => {
             
         }}
         >
+            <TopTab.Screen name="foodshop" component={FoodShopScreen} 
+            options={{
+                title:'已發佈',
+            }} />
             <TopTab.Screen name="unfinishorder" component={UnfinishorderScreen} 
             options={{
-                title:'尚未領取',
+                title:'已下單',
             }} />
             <TopTab.Screen name="finishorder" component={FinishorderScreen}
             options={{

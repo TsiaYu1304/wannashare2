@@ -28,14 +28,17 @@ const HomeScreen = ({navigation}) =>{
     
     useEffect(()=>{
     readData();
-    setName(firebase.auth().currentUser.displayName);
     },[]);
 
-    const readData = () => {
+    useEffect(()=>{
+    readData();
+    },[saler]);
+
+    const readData = async () => {
         console.log('切換');
         const FoodDetail = [];
         
-            firebase.database().ref("Orders").once('value', function(snapshot) {
+          await  firebase.database().ref("Orders").once('value', function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     FoodDetail.push({
                         food:childSnapshot.val().food,
@@ -49,23 +52,18 @@ const HomeScreen = ({navigation}) =>{
                         sellerUID:childSnapshot.val().sellerUID,
                         price:childSnapshot.val().price
                     });
+                    console.log(childSnapshot.val().food);
                 });
             });
-
-            
-
-
-
         setFoodData(FoodDetail);
-  
   
     };
    
-
+    
     const Lottieanim = () => {
         return saler?(
             <LottieView
-            source={require("../json/store_personal.json")}
+            source={require("../json/shop_personal.json")}
             loop={false}
             speed={1}
             />
@@ -73,13 +71,12 @@ const HomeScreen = ({navigation}) =>{
             
         ):(
             <LottieView
-            source={require("../json/personal_store.json")}
+            source={require("../json/personal_shop.json")}
             loop={false}
             speed={1}
             />
         )
     }
-
     
     const changesaler = () => {
         //readData();
@@ -88,8 +85,6 @@ const HomeScreen = ({navigation}) =>{
         setSaler(false);
         
         <Lottieanim/>
-        
-
     }
     else{
         setSaler(true);
@@ -98,9 +93,8 @@ const HomeScreen = ({navigation}) =>{
     }
     }
 
-
-
     const UserShopFoodcard =({navigation}) =>{
+        
     return saler ? (
         <FlatList
             data = {Fooddata}
@@ -130,11 +124,11 @@ const HomeScreen = ({navigation}) =>{
             <ScrollView>
             <View style={styles.Top_section}>
             <ImageBackground source={require('../img/homebg1.png')} style = {{width:setWidth(375),height:setheight(325)}}>
-                <View style={{height:0.112*deviceheight,paddingTop:setheight(22),paddingLeft:0.07*devicewidth}}>
-                <Text style={{color:'#fff',fontSize:setSptext(22)}}>Hello,{name}!</Text>
-                    <Text style={{color:'#fff',fontSize:setSptext(14),marginTop:0.001*deviceheight}}>歡迎使用想享!</Text>
+                <View style={{height:setheight(70),paddingTop:setheight(22),paddingLeft:0.07*devicewidth}}>
+                <Text style={{color:'#fff',fontSize:22}}>Hello,{name}!</Text>
+                    <Text style={{color:'#fff',fontSize:14,marginTop:0.001*deviceheight}}>歡迎使用想享!</Text>
                 </View>
-                <View style={{flexDirection:'row',justifyContent:'center'}}>
+                <View style={{marginTop:setheight(16),flexDirection:'row',justifyContent:'center'}}>
                    
                     <View style = {styles.Searchsection}>
                     <Image
@@ -149,7 +143,7 @@ const HomeScreen = ({navigation}) =>{
                 </View>
             
                 <View style={styles.RowScrollsection}>
-                    <View style={{alignItems:"center",height:setheight(56),justifyContent:'center'}}>
+                    <View style={{marginTop:setheight(16),alignItems:"center",height:setheight(56),justifyContent:'center'}}>
                     <Text style={styles.ScrollText}>精選商家</Text>
                     </View>
                     <View >
@@ -246,7 +240,7 @@ const styles = StyleSheet.create({
         marginLeft:0.07*devicewidth,
     },
     ScrollText:{
-        fontSize:setSptext(18),
+        fontSize:18,
         fontWeight:'600',
         color:'#fff'
         

@@ -77,7 +77,7 @@ const SignupScreen = ({navigation}) =>{
           await firebase.auth().signInWithEmailAndPassword(user.email, user.password);
           await firebase.auth().currentUser.updateProfile({
               displayName:name,
-              photoURL:"https://github.com/tsaiyuyes7/TsaiyuYes7_2020App/blob/master/src/icon/round-account-button-with-user-inside.png?raw=true"
+              photoURL:"https://github.com/TsiaYu1304/0721_wannashare/blob/master/src/img/IDphoto.png?raw=true"
           })
 
           setUser({...user,name:firebase.auth().currentUser.displayName})

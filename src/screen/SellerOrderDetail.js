@@ -1,25 +1,38 @@
 import React,{useState,useEffect} from "react";
-import {View, Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground} from "react-native"
+import {View, Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground,Modal,Dimensions} from "react-native"
 import MapView,{Marker} from "react-native-maps";
+import cusmapstyle from '../json/mapstyle.json'
+import { Button } from "react-native-elements";
+import LottieView from "lottie-react-native";
 import { AntDesign } from "@expo/vector-icons"
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import * as firebase from 'firebase'; 
+import { setheight, setWidth, setSptext } from '../component/ScreenUtil';
+import {Ionicons} from "@expo/vector-icons"
+import { color } from "react-native-reanimated";
 
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
 
 
 const SellerOrderDetailScreen = ({route,navigation}) =>{
+    const [showfinish,setshowfinish] = useState(false);
     const [hasPermission, setHasPermission] = useState(null);
     const [isScan,setisScan] = useState(false);
     const [useruid, setUid] = useState("");
-    const { name } = route.params;
+
     const { food } = route.params;
+    const { name } = route.params;
     const { Buyerphoto } = route.params;
+    const { Buyername } = route.params;
+    const { BuyerID } = route.params;
     const { img } = route.params;
     const { foodDetail } = route.params;
-    const { orderID } = route.params;
-    const { date } = route.params;
     const { number } = route.params;
-    console.log(`${isScan}`);
+    const { date } = route.params;
+    const { orderID } = route.params;
+    
+
    
     useEffect(() => {
         (async () => {
@@ -32,10 +45,47 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
 
         if(data === orderID) {
         setisScan(false);
-        alert(`finish`);
-        
-        }
+        setshowfinish(true);
+        }else {
+            setisScan(false);
+            alert(`unfinish`);
+            }
       };
+      const HandleConfirm = () => {
+          Addnifnishorder();
+          setshowfinish(false);
+          navigation.navigate('User');  
+      }
+
+      const Addnifnishorder = () => {
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("finish").child(orderID).set({
+            name:name,
+            img:img,
+            food:food,
+            foodDetail:foodDetail,
+            Buyerphoto:Buyerphoto,
+            BuyerID:BuyerID,
+            Buyername:Buyername,
+            date:date,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:orderID
+          });
+
+
+          firebase.database().ref("Users").child(BuyerID).child("Buyorder").child("finish").child(orderID).set({
+            name:name,
+            food:food,
+            foodDetail:foodDetail,
+            SellerPhoto:firebase.auth().currentUser.photoURL,
+            img:img,
+            date:date,
+            time:firebase.database.ServerValue.TIMESTAMP,
+            orderID:orderID,
+          });
+
+          firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").child(orderID).remove();
+          firebase.database().ref("Users").child(BuyerID).child("Buyorder").child("unfinish").child(orderID).remove();
+      }
     
 
 
@@ -71,30 +121,40 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
           justifyContent:'center'
           
         }}>
+        
         <BarCodeScanner
           onBarCodeScanned={handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject,{alignItems:'center',width:'100%',height:'100%',justifyContent:'center'}}
+          style={StyleSheet.absoluteFillObject,{flex:1,width:'100%',height:setheight(555)}}
           >
-            <TouchableOpacity onPress={()=>setisScan(false)}>
-            <AntDesign name="close" size={24} color='#fff' />
+              <View style={{marginTop:62}}>
+            <TouchableOpacity style={{alignItems:'center',justifyContent:'center',borderRadius:10,marginLeft:setWidth(16),backgroundColor:'#fff',width:setWidth(42),height:setheight(42)}} onPress={()=>setisScan(false)}>
+            <AntDesign name="close" size={24} color='#656565' />
             </TouchableOpacity>
+            </View>
+            
+            <View style={{marginTop:setheight(93),alignItems:'center',justifyContent:'center'}}>
+            <Image
+            source={require('../icon/square.png')}
+            style={{width:setWidth(221),height:setheight(221)}} />
+         
+             </View>
+          
+          <View style={{paddingTop:setheight(34),paddingLeft:setWidth(48),backgroundColor:'#fff',marginTop:setheight(91),borderRadius:25,height:setheight(303),width:devicewidth}}>
 
-          <View style={{height:300}} >
-          <View style={{flexDirection:'row',height:100}}>
-          <View style={styles.topLeftSquare}></View>
-          <View style={{flex:1}}></View>
-          <View style={styles.toprightSquare}></View>
-          </View>
-  
-          <View style={{width:300, height:100,flex:1}}></View>
-  
-          <View style={{flexDirection:'row',height:100}}>
-          <View style={styles.bottomLeftSquare}></View>
-          <View style={{flex:1}}></View>
-          <View style={styles.bottomrightSquare}></View>
-          </View>
-          </View>
+            <Text style={{color:'#656565',fontSize:setSptext(18)}}>掃描QRcode</Text>
+            <Text style={{marginTop:setheight(8),color:'#656565',fontSize:setSptext(18)}}>完成分享步驟</Text>
+            <Image
+                        source={require('../img/toastBaby.png')}
+                        style={{height:setheight(182),
+                        width:setWidth(182),
+                        marginLeft:setWidth(133)
+                    }}
+                        />
+            
+        </View>
         </BarCodeScanner>
+        
+        
  
       </View>
 
@@ -103,7 +163,11 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
         <ScrollView style={{backgroundColor:'#fff'}}>
             
             <View style={styles.detailView}> 
-            <View style={{flexDirection:'row'}}>
+            <View style={{flexDirection:'row',height:setheight(196)}}>
+                <ImageBackground 
+                source={require('../img/account_bg.png')}
+                style={{zIndex:5,height:setheight(252),width:devicewidth}}
+                >
             <TouchableOpacity
                 onPress={()=>navigation.goBack()}
                 style={{width:42,height:42,backgroundColor:'#fff',borderRadius:10,alignItems:'center',paddingTop:12,marginLeft:16}}>
@@ -112,45 +176,114 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
                     style={{width:18,height:18}}
                     />
             </TouchableOpacity>
-            <TouchableOpacity  onPress={()=>setisScan(true)}
-            style={{backgroundColor:'#fff',borderRadius:10,width:42,height:42,alignItems:'center',justifyContent:'center'}}>
-            <AntDesign name="scan1" size={24} color="#F0A202"/>
-            </TouchableOpacity>
-            </View>
-            <View style={{marginTop:16,alignItems:'center'}}>
             
-            <Text style={{fontSize:22,marginTop:8,color:'#fff'}}>{food}</Text>
+            </ImageBackground>
+            
             </View>
-            <View style={{backgroundColor:'#fff',borderRadius:25,marginTop:8,paddingTop:40}}>
-    
+            <View style={{top:setheight(126),position:'absolute',alignSelf:'center',zIndex:5}}>
+                <Image
+                source={{uri:img}}
+                style={{borderRadius:15,width:setWidth(195),height:setheight(195)}}
+                />
+                <Text style={{fontSize:setSptext(22),marginTop:setheight(8),alignSelf:'center',}}>{food}</Text>
+            </View>
+
+
+            <View style={styles.fooddetailcard}>
+            <View style={{marginTop:setheight(120)}}>
+
+            <View style={{marginTop:setheight(16),flexDirection:'row',justifyContent:'center'}}>
+                <TouchableOpacity style={styles.btn_touchable}>
+                    <Image source={require('../icon/chat2x.png')} style={{width:setWidth(18),height:setheight(18)}} />
+                    <Text style={{color:'#fff',fontSize:setSptext(15),marginLeft:setSptext(8)}}>聯絡分享人</Text>
+                </TouchableOpacity>
+                <TouchableOpacity  onPress={()=>setisScan(true)} style={styles.btn_touchable2}>
+                <AntDesign name="scan1" size={setWidth(18)} color="#fff"/>
+                    <Text style={{color:'#fff',fontSize:setSptext(15),marginLeft:setSptext(8)}}>掃描QRcode</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={{alignItems:'center'}}>
+
+            <View style={styles.buyer_detail_card}>
             <View >
-            <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14,width:62}}>分享者</Text>
-                        <Text>{name}</Text>
+                <Text style={{fontSize:setSptext(18),color:'#656565',fontWeight:'bold'}}>領取人資訊</Text>
+                <View style={{flexDirection:'row',marginTop:setheight(26)}}>
+                    <Text style={styles.buyer_detail_text}>領取人</Text>
+                    <Image
+                    style={{width:setWidth(32),height:setheight(32),borderRadius:20,bottom:5}}
+                    source={{uri:Buyerphoto}}
+                    />
+                    <Text style={styles.buyer_detail_text_namecontent}>{Buyername}</Text>
                 </View>
-                <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14,width:62}}>說明</Text>
-                        <Text >{foodDetail}</Text>
+                <View style={{flexDirection:'row',marginTop:setheight(16)}}>
+                    <Text style={styles.buyer_detail_text}>領取時間</Text>
+                    <Text style={styles.buyer_detail_text_content}>時間還沒用</Text>
                 </View>
-                <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14,width:62}}>期限</Text>
-                        <Text>{date}</Text>
-                </View>
-                <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14,width:62}}>數量</Text>
-                        <Text>{number}</Text>
-                </View>
-                <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14,width:62}}>地點</Text>
-                    <Text >台北市大安區和平東路360號</Text>
+                <View style={{flexDirection:'row',marginTop:setheight(16)}}>
+                    <Text style={styles.buyer_detail_text}>數量</Text>
+                    <Text style={styles.buyer_detail_text_content}>1</Text>
                 </View>
             </View>
-            <View style={{height:372,justifyContent:'center',alignItems:'center'}}>
+            </View>
+            </View>
+            
+            <View style={styles.fooddetailcontent}>
+
+        
+                <View style={styles.FooddetailList}>
+                    <Text style={{fontSize:setSptext(18),width:setWidth(86),color:'#656565'}}>價格</Text>
+                        <Text style={styles.fooddetailcontent_text}>免費</Text>
+                </View>
+                <View style={styles.FooddetailList}>
+                    <Text style={{fontSize:setSptext(18),width:setWidth(86),color:'#656565'}}>說明</Text>
+                        <Text style={styles.fooddetailcontent_text}>{foodDetail}</Text>
+                </View>
+                <View style={styles.FooddetailList}>
+                    <Text style={{fontSize:setSptext(18),width:setWidth(86),color:'#656565'}}>期限</Text>
+                        <Text style={styles.fooddetailcontent_text}>{date}</Text>
+                </View>
+                <View style={styles.FooddetailList}>
+                    <Text style={{fontSize:setSptext(18),width:setWidth(86),color:'#656565'}}>地點</Text>
+                    <Text style={styles.fooddetailcontent_text}>捷運科技大樓站</Text>
+                </View>
+            </View>
+
+            <Modal
+            visible={showfinish}
+            transparent
+            animationType="fade"
+            onRequestClose={() => {}}
+            >
+                <View style={styles.containerStyle}>
+                    <View style={styles.finish_cardstyle}>
+                    <LottieView
+                    style={{height: setheight(200),width:setWidth(200)}}
+                    source={require("../json/final.json")}
+                    autoPlay loop
+                    speed={1}
+                    />
+                    <Text style={{color:'#656565'}}>交易完成 !</Text>
+                    <Text style={{marginTop:setheight(8),color:'#656565'}}>獲得想享幣一枚</Text>
+
+                    <Button
+                        title="確定"
+                        titleStyle={{color:'#fff',fontSize:13}}
+                        buttonStyle={styles.confirmbutton}
+                        onPress={HandleConfirm}
+                        />
+                    </View>
+
+                </View>     
+        </Modal>
+            <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+
+                
                 <MapView
                 region={region}
-                style={{width:340,height:340}}
+                style={styles.mapstyle}
                 showsTraffic
                 provider="google"
+                customMapStyle={cusmapstyle}
                 >
                     <Marker
                     coordinate={marker.coord}
@@ -160,6 +293,13 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
                 </MapView>
                 
             
+            
+            </View>
+            <View style={{alignItems:'center',marginTop:setheight(16)}}>
+                <TouchableOpacity style={styles.cancel_btn}>
+                    <Text style={{color:'#ffff',fontSize:setSptext(15)}}>取消訂單</Text>
+                </TouchableOpacity>
+            </View>
             </View>
             </View>
             </View>
@@ -167,60 +307,131 @@ const SellerOrderDetailScreen = ({route,navigation}) =>{
     )
 }
 
+
 const styles = StyleSheet.create({
-    topLeftSquare:{
-        flex:1,
-        width:100,
-        borderColor:'#F0A202',
-        borderTopStartRadius:40,
-        borderLeftWidth:10,
-        borderTopWidth:10
-      },
-      toprightSquare:{
-        flex:1,
-        width:100,
-        borderColor:'#F0A202',
-        borderTopRightRadius:40,
-        borderRightWidth:10,
-        borderTopWidth:10,
-      },
-      bottomLeftSquare:{
-        flex:1,
-        width:100,
-        borderColor:'#F0A202',
-        borderBottomLeftRadius:40,
-        borderLeftWidth:10,
-        borderBottomWidth:10
-      },
-      bottomrightSquare:{
-        flex:1,
-        width:100,
-        borderColor:'#F0A202',
-        borderBottomRightRadius:40,
-        borderRightWidth:10,
-        borderBottomWidth:10
-      },
-    detailView:{
+    cancel_btn:{
+        width:setWidth(340),
+        height:setheight(42),
         backgroundColor:'#F0A202',
-        paddingTop:62
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:10
+    },
+    mapstyle:{
+        marginTop:setheight(8),
+        width:setWidth(340),
+        height:setheight(318),
+        borderRadius:10
+    }, 
+    confirmbutton:{ 
+        backgroundColor: '#f0A202', 
+        width: setWidth(103), 
+        height:setheight(42),
+        borderRadius:10,
+        marginTop:setheight(24)
+    },
+    finish_cardstyle:{
+        paddingTop:setheight(40),
+        width:setWidth(287),
+        height:setheight(393),
+        borderRadius:20,
+        alignItems:'center',
+        backgroundColor:'#fff'
+    },
+    containerStyle: {
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        position: "relative",
+        flex: 1,
+        justifyContent: "center",
+        alignItems:'center'
+        
+      },
+    buyer_detail_text_namecontent:{
+        fontSize:setSptext(18),
+        color:'#656565',
+        marginLeft:setWidth(8)
+    },
+    buyer_detail_text_content:{
+        fontSize:setSptext(18),
+        color:'#656565',
 
     },
-    Foodimg:{
-        width:375,
-        height:327,
-        paddingTop:48,
-        paddingLeft:16
+    buyer_detail_text:{
+        fontSize:setSptext(18),
+        color:'#656565',
+        width:setWidth(86)
+
+    },
+    buyer_detail_card:{
+        width:setWidth(311),
+        height:setheight(222),
+        borderRadius:20,
+        shadowColor:'#76510466',
+        shadowOffset:{width:10,height:10},
+        shadowOpacity:0.4,
+        backgroundColor:'#fff',
+        alignItems:'center',
+        justifyContent:'center',
+        marginTop:setheight(33)
+        
+    },
+    btn_touchable:{
+        flexDirection:'row',
+        width:setWidth(147),
+        height:setheight(42),
+        backgroundColor:'#f0A202',
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:10
+    },
+    btn_touchable2:{
+        flexDirection:'row',
+        width:setWidth(147),
+        height:setheight(42),
+        backgroundColor:'#f0A202',
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:10,
+        marginLeft:setWidth(17)
+    },
+    fooddetailcard:{
+        flex:1,
+        backgroundColor:'#fff',
+        borderTopEndRadius:25,
+        borderTopStartRadius:25
+    },
+    fooddetailcontent:{
+        backgroundColor:'#fff',
+        marginTop:setheight(32)
+
+    },
+    fooddetailcontent_text:{
+        color:'#656565',
+        fontSize: setSptext(18)
+
+    },
+    fooddetailcontent_text2:{
+        color:'#656565',
+        fontSize: setSptext(15)
+
+    },
+    
+    detailView:{
+        backgroundColor:'#F0A202',
+        flex:1,
+        paddingTop:setheight(44)
+
     },
     Userphoto:{
-        width:64,
-        height:64,
+        width:setheight(64),
+        height:setheight(64),
         borderRadius:35,
-        marginLeft:16
+        marginLeft:setWidth(16)
     },
     FooddetailList:{
-        height:42,
-        width:375,
-        marginLeft:60,
+        height:setheight(42),
+        width:devicewidth,
+        marginLeft:setWidth(32),
         flexDirection:'row',
         alignItems:'center'  
     },
@@ -237,18 +448,6 @@ const styles = StyleSheet.create({
     },
     Twobutton:{
         flexDirection:'row'
-    },
-    btn:{
-        flexDirection:'row',
-        alignItems:'center',
-        justifyContent:'center',
-        width:163,
-        height:42,
-        marginLeft:16,
-        backgroundColor:'#F0A202',
-        borderRadius:10,
-        marginTop:32,
-        marginBottom:32
     }
 
 

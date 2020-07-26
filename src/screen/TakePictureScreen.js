@@ -2,6 +2,11 @@ import React, { useState, useEffect ,useRef} from 'react';
 import { Text, View, TouchableOpacity,Modal ,Image, Dimensions,StyleSheet} from 'react-native';
 import { Camera } from 'expo-camera';
 import {Entypo, FontAwesome,AntDesign,MaterialCommunityIcons} from "@expo/vector-icons"
+import { setheight, setWidth, setSptext ,scaleSize} from '../component/ScreenUtil';
+import { color } from 'react-native-reanimated';
+
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
 
 var {height,width} = Dimensions.get('window');
 
@@ -44,17 +49,24 @@ const TakepictureScreen = ({navigation}) =>{
   
   return (
     <View style={{ flex: 1 ,backgroundColor:'#fff'}}>
-      <View style={{height:height*0.18}}></View>
+      <View style={styles.close_btn}>
+        <TouchableOpacity onPress={() => navigation.goBack() } >
+        <AntDesign name="close" size={setWidth(32)} color="#F0A202" />
+        </TouchableOpacity>
+      </View>
       <Camera style={styles.CameraStyle} type={type} ref={camRef}/>
 
       <View style={styles.BtnView}>
-        <TouchableOpacity onPress={() => navigation.goBack() } style={{marginRight:0.146*width}}>
-          <AntDesign name="back" size={width*0.1} color='#F0A202'/>
+        <TouchableOpacity style={{marginRight:setWidth(50)}}>
+        <Image
+            source={require('../icon/album.png')}
+            style={{width:setWidth(32),height:setheight(32)}}
+            />
         </TouchableOpacity>
           <TouchableOpacity  onPress={() => takePicture()}>  
-            <MaterialCommunityIcons name="circle-slice-8" size={width*0.21} color='#F0a202'/>
+            <MaterialCommunityIcons name="circle-slice-8" size={setWidth(76)} color='#F0a202'/>
           </TouchableOpacity>
-          <TouchableOpacity style={{marginLeft:0.146*width}}
+          <TouchableOpacity style={{marginLeft:setWidth(50)}}
           onPress={() => {
             setType(
               type === Camera.Constants.Type.back
@@ -63,7 +75,10 @@ const TakepictureScreen = ({navigation}) =>{
             );
           }}
           >
-          <AntDesign name="sync" size={width*0.1} color='#F0A202'/>
+          <Image
+            source={require('../icon/refresh.png')}
+            style={{width:setWidth(32),height:setheight(32)}}
+            />
         </TouchableOpacity>
       </View>
       { capturePhoto &&
@@ -72,9 +87,9 @@ const TakepictureScreen = ({navigation}) =>{
         transparent = {false}
         visible = {open}
         >
-            <View style={{alignItems:'center'}}>
+            <View style={{flex:1,alignItems:'center'}}>
 
-               <View style={{height:height*0.11}}></View>
+               <View style={{height:setheight(144)}}></View>
                 <Image
                     style={styles.showImage}
                     source={{uri:capturePhoto.uri}}
@@ -82,16 +97,22 @@ const TakepictureScreen = ({navigation}) =>{
                 <View style={styles.BtnView}>
 
                 <TouchableOpacity
-                style={{marginRight:0.15*width}}
+                style={styles.undo_btn}
                 onPress={()=>{setOpen(false)}}>
-                <AntDesign name="leftcircleo" size={width*0.17} color="#F0A202"/>
+                <Image
+                source={require('../icon/undo.png')}
+                style={{width:setWidth(24),height:setheight(24)}}
+                />
                 </TouchableOpacity>
 
 
                 <TouchableOpacity
-                style={{marginLeft:0.15*width}}
+                style={styles.tick_btn}
                 onPress={navtoAdd}>
-                <AntDesign name="checkcircle" size={width*0.17} color="#F0A202"/>
+                <Image
+                source={require('../icon/tick.png')}
+                style={{width:setWidth(24),height:setheight(24)}}
+                />
                 </TouchableOpacity>
 
 
@@ -105,20 +126,46 @@ const TakepictureScreen = ({navigation}) =>{
 
 const styles = StyleSheet.create({
 CameraStyle:{
-  width:width,
-  height:0.4*height
+  width:devicewidth,
+  height:devicewidth
 },
 BtnView:{
   marginTop:0.157*height,
   flexDirection:'row',
-  height:width*0.21,
-  alignItems:'flex-end',
+  height:setheight(76),
+  alignItems:'center',
   justifyContent:'center'
 },
 showImage:{
-  width:width,
-  height:0.4*height,
-  marginTop:0.07*height
+  width:devicewidth,
+  height:devicewidth
+},
+close_btn:{
+  height:setheight(144),
+  paddingTop:setheight(94),
+  paddingLeft:setWidth(32)
+
+},
+undo_btn:{
+  marginRight:setWidth(62),
+  borderColor:'#F0A202',
+  borderWidth:3,
+  borderRadius:40,
+  width:setWidth(64),
+  height:setheight(64),
+  justifyContent:'center',
+  alignItems:'center'
+}
+,
+tick_btn:{
+  marginLeft:setWidth(62),
+  backgroundColor:'#F0A202',
+  borderRadius:40,
+  width:setWidth(64),
+  height:setheight(64),
+  justifyContent:'center',
+  alignItems:'center'
+
 }
 
 })

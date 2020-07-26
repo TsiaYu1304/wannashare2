@@ -16,7 +16,7 @@ const Add = ({route,navigation}) => {
     const { capturePhoto } = route.params;
     const [id,setId] = useState("");
     const [foodimgURL,setURL]=useState(""); 
-    const [price,setPrice] = useState("100");
+    const [price,setPrice] = useState("免費");
 
     async function createID () {
         const iid = await nanoid(10);
@@ -50,7 +50,7 @@ const Add = ({route,navigation}) => {
        //console.log(`URL=${firebase.storage().ref(iid).child("foodpicture").getDownloadURL()}`); 
        
 
-        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").child(iid).set({
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("foodshop").child(iid).set({
             name:firebase.auth().currentUser.displayName,
             food:food,
             foodDetail:foodDetail,
@@ -62,7 +62,9 @@ const Add = ({route,navigation}) => {
             price:price
           });
 
-          firebase.database().ref("Orders").child(iid).set({
+          firebase.database().ref("Orders").child(iid
+            
+            ).set({
             name:firebase.auth().currentUser.displayName,
             SellerPhoto:firebase.auth().currentUser.photoURL,
             food:food,
@@ -75,6 +77,7 @@ const Add = ({route,navigation}) => {
             sellerUID:firebase.auth().currentUser.uid,
             price:price
           });
+
 
 
         
@@ -228,13 +231,12 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     share_btn:{
-        position:'absolute',
-        alignSelf:'flex-end',
         height:0.064*height,
         backgroundColor:"#F0A202F0",
         alignItems:'center',
         justifyContent:'center',
-        marginTop:0.04*height
+        marginTop:0.04*height,
+        top:18
     }
 
 });

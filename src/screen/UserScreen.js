@@ -7,13 +7,17 @@ import { TabView, SceneMap ,TabBar} from 'react-native-tab-view';
 import * as firebase from 'firebase'; 
 import fakefoodfata from "../json/fooddetail.json"
 import * as ImagePicker  from 'expo-image-picker'
+import { setheight, setWidth, setSptext } from '../component/ScreenUtil';
+
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
 
 
 
 
 const Foodcard = ({post, navigation}) => {
     return(
-        <View style={{height:113 }}>
+        <View style={{height:setheight(120) }}>
         <TouchableOpacity
             onPress={() => navigation.navigate('OrderDetail',{
                 food:post.food,
@@ -57,11 +61,14 @@ const Foodcard = ({post, navigation}) => {
   
   
 const User = ({navigation}) => {
+    
+    let finishExist = false;
     const [finifoodData,setFinifoodData] = useState([]);
     const [foodData,setFoodData] = useState([]);
     const {userState} = useContext(StoreContext);
     const [user,setUser] = userState;
     const [Orderexist,setOrder] = useState(false);
+    const [Finiorderexist,setFiniorder] = useState(false);
     const [tabnumber,setNum] = useState(0);
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
@@ -96,6 +103,7 @@ const User = ({navigation}) => {
 
   const FirstRoute = () => (
     Orderexist?(
+        
         <FlatList
             data = {foodData}
             renderItem = {({item}) => 
@@ -107,25 +115,37 @@ const User = ({navigation}) => {
         />
         
     ):(
-    <View></View>
+        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+            <Image 
+            source={require('../img/No_buy.png')}
+            style={{height:setheight(200),width:setWidth(200)}}
+            />
+            <Text style={{color:'#656565',fontSize:setSptext(18)}} >尚無未領取食物</Text>
+        </View>
     )
     
   );
 
   const SecondRoute = () => (
-    <View><View style={{flexDirection:'row',height:88,marginTop:25}}>
-    <Image
-    source={require('../img/user_tomato.png')}
-    style={{height:88,width:88,borderRadius:10,marginLeft:26}}
-    />
-    <View style={{flexDirection:'column',marginTop:5,marginLeft:16}}>
-        <Text>小明</Text>
-        <Text style={{fontSize:18,marginTop:8}}>聖女小番茄</Text>            
-        <Text style={{marginTop:8}}>領取時間：4/25 20:00</Text>
-    </View>
-    
-
-</View></View> 
+    Finiorderexist? (
+        <FlatList
+            data = {finifoodData}
+            renderItem = {({item}) => 
+            <Foodcard
+            post = {item}
+            navigation = {navigation}
+            />}
+            keyExtractor = {item => item.name}
+        />
+    ):(
+        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+            <Image 
+            source={require('../img/No_buy.png')}
+            style={{height:setheight(200),width:setWidth(200)}}
+            />
+            <Text style={{color:'#656565',fontSize:setSptext(18)}} >尚無已領取食物</Text>
+        </View>
+    )
   );
     const renderScene = SceneMap({
         first: FirstRoute,
@@ -149,46 +169,59 @@ const User = ({navigation}) => {
     useEffect(()=>{
     readData();
     },[]);
+
+    
     const readData = async () => {
         const FoodDetail = [];
+        const FiniFoodDetail = [];
         
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                FoodDetail.push({
-                    food:childSnapshot.val().food,
-                    name:childSnapshot.val().name,
-                    img:childSnapshot.val().img,
-                    SellerPhoto:childSnapshot.val().SellerPhoto,
-                    foodDetail:childSnapshot.val().foodDetail,
-                    date:childSnapshot.val().date,
-                    time:childSnapshot.val().time,
-                    orderID:childSnapshot.val().orderID,
-                    price:childSnapshot.val().price   
-                });
-              });
+            if(snapshot.exists()){
+                snapshot.forEach(function(childSnapshot) {
+                    FoodDetail.push({
+                        food:childSnapshot.val().food,
+                        name:childSnapshot.val().name,
+                        img:childSnapshot.val().img,
+                        SellerPhoto:childSnapshot.val().SellerPhoto,
+                        foodDetail:childSnapshot.val().foodDetail,
+                        date:childSnapshot.val().date,
+                        time:childSnapshot.val().time,
+                        orderID:childSnapshot.val().orderID,
+                        price:childSnapshot.val().price   
+                    });
+                  });
+                  setFoodData(FoodDetail);
+                  setOrder(true);
+            }else{
+                setOrder(false);
+            }
             });
 
         
-        setFoodData(FoodDetail);
+       
 
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").once('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                finifoodData.push({
-                    food:childSnapshot.val().food,
-                    name:childSnapshot.val().name,
-                    img:childSnapshot.val().img,
-                    SellerPhoto:childSnapshot.val().SellerPhoto,
-                    foodDetail:childSnapshot.val().foodDetail,
-                    date:childSnapshot.val().date,
-                    time:childSnapshot.val().time,
-                    orderID:childSnapshot.val().orderID         
-                });
-              });
+            if(snapshot.exists()){
+                snapshot.forEach(function(childSnapshot) {
+                    FiniFoodDetail.push({
+                        food:childSnapshot.val().food,
+                        name:childSnapshot.val().name,
+                        img:childSnapshot.val().img,
+                        SellerPhoto:childSnapshot.val().SellerPhoto,
+                        foodDetail:childSnapshot.val().foodDetail,
+                        date:childSnapshot.val().date,
+                        time:childSnapshot.val().time,
+                        orderID:childSnapshot.val().orderID         
+                    });
+                  });
+                  setFinifoodData(FiniFoodDetail);
+                  setFiniorder(true);
+            }else{
+                setFiniorder(false);
+            }
             });
             
-        setFinifoodData(finifoodData);
-
-        setOrder(true);
+       
   
     };
 
@@ -210,16 +243,13 @@ const User = ({navigation}) => {
  
 
     return (
-        <View style={{bottom:20}}>
-            <View style={{ height: 70, width: 375, backgroundColor: '#F0A202F0', }}>
-
-            </View>
+        <View style={{flex:1,backgroundColor:'#F0A202'}}>
             <View style={styles.user_profile}>
                 <ImageBackground
-                    style={{width:376,height:321,paddingTop:66}}
-                    source={require("../img/userbg.png")}
+                    style={styles.userbackgoundimg}
+                    source={require("../img/account_bg.png")}
                 >
-                    <View style={{height:162,alignItems:'center'}}>
+                    <View style={{height:setheight(162),alignItems:'center'}}>
                     <TouchableOpacity onLongPress={onPress}>
                     <Image
                         style={styles.user_profile_img_}
@@ -229,13 +259,13 @@ const User = ({navigation}) => {
     <Text style={styles.user_profile_name}>{user.name}</Text>
     <Text style={styles.user_profile_mail}>{user.email}</Text>
                     </View>
-                    <View style={{flexDirection:'row',paddingLeft:30}}>
+                    <View style={{flexDirection:'row',paddingLeft:setWidth(30)}}>
                         <View  style={styles.btn4_view}>
                             <TouchableOpacity style={styles.btn4_touchable}
                             onPress={() => navigation.navigate('Coin')}>
                                 <Image
                                 source={require("../icon/coin.png")}
-                                style={{width:44,height:44}}
+                                style={styles.btn4_img}
                                 />
                             </TouchableOpacity>
                             <Text style={styles.btn4_text}>想享幣</Text>
@@ -245,7 +275,7 @@ const User = ({navigation}) => {
                             onPress={() => navigation.navigate('Chat')}>
                                 <Image
                                 source={require("../icon/messege.png")}
-                                style={{width:44,height:44}}
+                                style={styles.btn4_img}
                                 />
                             </TouchableOpacity>
                             <Text style={styles.btn4_text}>聊天紀錄</Text>
@@ -255,7 +285,7 @@ const User = ({navigation}) => {
                             onPress={() => navigation.navigate('Coupon')}>
                                 <Image
                                 source={require("../icon/coupon.png")}
-                                style={{width:44,height:44}}
+                                style={styles.btn4_img}
                                 />
                             </TouchableOpacity>
                             <Text style={styles.btn4_text}>優惠券</Text>
@@ -266,7 +296,7 @@ const User = ({navigation}) => {
                             style={styles.btn4_touchable}>
                                 <Image
                                 source={require("../icon/setting.png")}
-                                style={{width:44,height:44}}
+                                style={styles.btn4_img}
                                 />
                             </TouchableOpacity>
                             <Text style={styles.btn4_text}>設定</Text>
@@ -288,8 +318,9 @@ const User = ({navigation}) => {
                 </View>
             </View>
             <ScrollView style={styles.order_view}>
+                
             <TabView
-            style={{top:13}}
+            style={{top:setheight(13)}}
             navigationState={{ index, routes }}
             renderScene={renderScene}
             onIndexChange={setIndex}
@@ -297,14 +328,13 @@ const User = ({navigation}) => {
             renderTabBar={props=>
                 <TabBar
                     {...props}
-                    style={{backgroundColor:'#fff',color:'#656565',shadowColor:'#fff',elevation:0}}
-                    indicatorStyle={{ backgroundColor: '#F0A202' ,width:94,marginLeft:49}}
-                    labelStyle={{color:'#656565',fontSize:17}}
+                    style={{backgroundColor:'#fff',color:'#656565',shadowColor:'#fff'}}
+                    indicatorStyle={{ backgroundColor: '#F0A202' ,width:setWidth(94),marginLeft:setheight(49)}}
+                    labelStyle={{color:'#656565',fontSize:setSptext(17)}}
                 />
             }
 
             />
-            
             </ScrollView>
             
         </View>
@@ -313,81 +343,34 @@ const User = ({navigation}) => {
 const styles = StyleSheet.create({
     order_view:{
         backgroundColor:'#fff',
-        borderRadius:16,
-        height:1000,
-        bottom:20
+        borderTopStartRadius:20,
+        borderTopEndRadius:20
+        
     },
     user_profile: {
-        width: 375,
-        height:356,
+        marginTop:setheight(44),
+        width: devicewidth,
         flexDirection: "row",
         justifyContent: "flex-start",
         backgroundColor:'#F0A202'
     },
     user_profile_img: {
-        width: 114,
-        height: 132,
-        // backgroundColor:'tomato',
+        width: setWidth(114),
+        height: setheight(132)
     },
     user_profile_img_: {
-        width: 88,
-        height: 88,
+        width: setWidth(88),
+        height: setheight(88),
         borderRadius: 50
-
 
     },
     user_profile_name:{
         color:'#fff',
-        fontSize:22
+        fontSize:setSptext(22)
     },
     user_profile_mail:{
         color:'#fff',
-        fontSize:14
-    },
-    user_list: {
-        width: 323,
-        height: 130,
-        backgroundColor: '#fff',
-        top: -52,
-        left: 26,
-        shadowColor: "#000",
-        shadowOffset: { width: 3, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 10,
-        borderRadius: 20,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        marginTop:16,
-
-    },
-    user_list_img: {
-        width: 114,
-        height: 130,
-       // backgroundColor:'purple',
-    },
-    user_list_detail: {
-        width: 209,
-        height: 130,
-        paddingTop:26,
-        paddingLeft:16,
-       // backgroundColor:'blue',
-    },
-    user_list_detail_medal:{
-        width:323,
-        height:130,
-        left:-130,
-        top:-95,
-        //backgroundColor:'black',
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-    },
-    user_list_detail_medal_:{
-        width:60,
-        height:60,
-        backgroundColor:'red',
-        top:16,
-        
-        right:16
+        fontSize:setSptext(14)
     },
     btn4_view:{
         flexDirection:'column',
@@ -395,21 +378,29 @@ const styles = StyleSheet.create({
         paddingLeft:19
     },
     btn4_touchable:{
-        width:55,
-        height:55,
+        width:setWidth(55),
+        height:setheight(55),
         borderRadius:30,
         backgroundColor:'#fff',
         alignItems:'center',
-        paddingTop:5,
+        justifyContent:'center',
         shadowColor:'#765104',
         shadowOpacity:0.4,
-        elevation:24,
         shadowOffset:{width:10,height:10},
     },
     btn4_text:{
         color:'#fff',
-        marginTop:10,
-        fontSize:12
+        marginTop:setheight(10),
+        fontSize:setSptext(12)
+    },
+    btn4_img:{
+        width:setWidth(44),
+        height:setheight(44)
+    },
+    userbackgoundimg:{
+        width:devicewidth,
+        height:setheight(312),
+        paddingTop:setheight(22)
     }
 
 

@@ -1,13 +1,18 @@
 import React,{useState,useEffect} from "react";
-import {View, Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground} from "react-native"
-import {Button} from "react-native-elements";
+import {View,TextInput ,Modal,Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground,Dimensions} from "react-native"
+import { Card, Button } from "react-native-elements";
+import DatePicker from 'react-native-custom-datetimepicker'
 import fooddata from "../json/fooddetail.json";
 import { round } from "react-native-reanimated";
 import MapView,{Marker} from "react-native-maps";
+import cusmapstyle from '../json/mapstyle.json'
 import Confirm from "../component/Confirm.js"
 import * as firebase from 'firebase'; 
 import {nanoid} from  'nanoid/async/index.native'
-
+import { setWidth, setheight, setSptext } from '../component/ScreenUtil';
+import {Fontisto} from "@expo/vector-icons"
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
 
 
 const FooddetailScreen = ({route,navigation}) =>{
@@ -24,12 +29,20 @@ const FooddetailScreen = ({route,navigation}) =>{
     const { sellerUID } = route.params;
     const { price } = route.params;
     const [showModal, setShowModal] = useState(false);
+    const [showConfirm,setShowConfirm]= useState(false);
     const { Myname } = firebase.auth().currentUser.displayName;
     const { MyUID } = firebase.auth().currentUser.uid;
     const { MyURL } = firebase.auth().currentUser.photoURL;
     const [Dataexist,setExist] = useState(false);
     const [Room_ID,setRoomID] = useState("");
+    const [choseDate,setChoseDate] = useState(new Date());
 
+    const setDate =(date) => {
+      
+      console.log(date);
+  
+      return setChoseDate(date);
+    }
     //建立聊天室資料庫
     const BuildChatRoominUserData = (ID) =>{
         //買家方增加聊天室
@@ -149,28 +162,35 @@ const FooddetailScreen = ({route,navigation}) =>{
 
           //分享者 “分享訂單” “完成：未完成”
 
-          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("finish").child(orderID).set({
+          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("unfinish").child(orderID).set({
             name:name,
+            img:img,
             food:food,
             foodDetail:foodDetail,
-            Buyerphoto:firebase.auth().currentUser.photoURL,
             price:price,
+            Buyerphoto:firebase.auth().currentUser.photoURL,
             BuyerID:firebase.auth().currentUser.uid,
-            img:img,
-            date:date,
+            Buyername:firebase.auth().currentUser.displayName
+,           date:date,
             time:firebase.database.ServerValue.TIMESTAMP,
-            orderID:orderID,
-            finish:false
+            orderID:orderID
           });
 
-          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("unfinish").child(orderID).remove();
+          firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("foodshop").child(orderID).remove();
           firebase.database().ref("Orders").child(orderID).remove();
       }
+  
+    //Modal
+    const AcceptShowConfrim = () => {
+        setShowConfirm(false)
+        navigation.navigate('User')   
+    }
 
     const AcceptOrder = () => { //確認下單
         addunfinishorder();
         setShowModal(false);
-
+        setShowConfirm(true);
+        
         
     };
     const onOpenModal = () => { //按我要下單
@@ -180,6 +200,8 @@ const FooddetailScreen = ({route,navigation}) =>{
       const onCLoseModal = () => {
         setShowModal(false);
     };
+
+    //地圖
 
     const [region,setRegion] = useState({
         longitude: 121.544637,
@@ -204,18 +226,15 @@ const FooddetailScreen = ({route,navigation}) =>{
             latitude: rgn.latitude
         }});
     }
-    //console.log(`post name=${post.name}`);
-    return (
 
+    return (
+        <View style={{flex:1}}>
         <ScrollView style={{backgroundColor:'#fff'}}>
-            <View style={{
-        shadowColor:"#9A9A9A",
-        shadowOffset:{width:5,height:5},
-        shadowOpacity:0.4}}>
+            
+            <View >
             <ImageBackground
                 source={{uri:img}}
                 style={styles.Foodimg}
-
             >
                 <TouchableOpacity
                 onPress={()=>navigation.goBack()}
@@ -225,6 +244,7 @@ const FooddetailScreen = ({route,navigation}) =>{
                     style={{width:18,height:18}}
                     />
                 </TouchableOpacity>
+
             </ImageBackground>
             </View>
             <View style={styles.detailView}> 
@@ -234,9 +254,9 @@ const FooddetailScreen = ({route,navigation}) =>{
                     style={styles.Userphoto}
                 />
                 <View style={{marginLeft:8}}>
-                    <Text style={{fontSize:12,color:'#949494'}}>{name}</Text>
-                    <Text style={{fontSize:22,color:'#949494'}}>{food}</Text>
-                    <Text style={{fontSize:12,color:'#949494',marginTop:2}}>5小時前發布</Text>
+                    <Text style={{fontSize:setSptext(14),color:'#656565'}}>{name}</Text>
+                    <Text style={{fontSize:setSptext(20),color:'#656565',marginTop:setheight(4)}}>{food}</Text>
+                    <Text style={{fontSize:setSptext(14),color:'#656565',marginTop:setheight(4)}}>5小時前發布</Text>
                 </View>
                 <View style={styles.Disandprice}>
                    
@@ -244,17 +264,17 @@ const FooddetailScreen = ({route,navigation}) =>{
                         source={require('../icon/pricetag.png')}
                         style={{height:26,width:26,marginTop:-2}}
                     />
-                    <Text style={{fontSize:18,color:'#949494'}}>{price}</Text>
+                    <Text style={{marginLeft:setWidth(2),fontSize:setSptext(18),color:'#949494'}}>{price}</Text>
                 </View>
             </View>
             <View style={styles.Twobutton}>
                 <TouchableOpacity onPress={Chatwithseller}>
-                    <View style={styles.btn}>
+                    <View style={styles.btn2}>
                         <Image
                         source={require('../icon/chat2x.png')}
-                        style={{width:18,height:18}}
+                        style={{width:setWidth(18),height:setheight(18)}}
                         />
-                        <Text style={{fontSize:15 ,marginLeft:14,color:'#fff'}}>聯絡分享者</Text>
+                        <Text style={{fontSize:setSptext(15) ,marginLeft:setWidth(14),color:'#fff'}}>聯絡分享者</Text>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -262,46 +282,140 @@ const FooddetailScreen = ({route,navigation}) =>{
                     <View style={styles.btn}>
                         <Image
                         source={require('../icon/shopping-bag.png')}
-                        style={{width:18,height:18}}
+                        style={{width:setWidth(18),height:setheight(18)}}
                         />
-                        <Text style={{fontSize:15 ,marginLeft:14,color:'#fff'}}>我要下訂
+                        <Text style={{fontSize:setSptext(15) ,marginLeft:setWidth(14),color:'#fff'}}>我要下訂
                         </Text>
                     </View>
                 </TouchableOpacity>
-                <Confirm
-                title="確定下單?"
-                visible={showModal}
-                onAccept={ ()=>{
-                            AcceptOrder()
-                            navigation.navigate('User')                                   
-                         }}
-                onDecline={onCLoseModal}
-                />
+
+             
+    <Modal
+      visible={showModal}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}}
+    >
+      <View style={styles.containerStyle}>
+        <Card containerStyle={styles.cardstyle} 
+              dividerStyle={{width:0}} 
+              titleStyle={{fontSize:setSptext(17),color:'#656565'}}
+              title={"確認訂單"}
+        >
+          <View style={{marginTop:setheight(24),flexDirection:'row',marginLeft:setWidth(18)}}>
+          <Text style={{color:'#656565',fontSize:setSptext(18)}}>數量</Text>
+          <TextInput
+          value={"1"}
+          style={{marginLeft:setWidth(82),fontSize:setSptext(18)}}
+          />
+          </View>
+          <Text style={{color:'#656565',marginTop:setheight(53),fontSize:setSptext(18),marginLeft:setWidth(18)}}>領取時間</Text>
+          
+          <View style={{flexDirection:'row-reverse',alignItems:'center'}}>
+          <Fontisto name="date" size={setheight(24)} color='#000' style={{left:setWidth(24),top:setheight(8)}} /> 
+          <DatePicker
+            removeUnderline = {true}
+            style={styles.pickStyles}
+            date={choseDate}
+            mode="datetime"
+            format="YYYY-MM-DD a h:mm"
+            minDate="2020-08-31"
+            maxDate="2020-07-24"
+            locale="zh"
+            confirmBtnText="確定"
+            cancelBtnText="取消"
+            showIcon = {false}
+            customStyles={{
+              btnConfirm:{
+                height:100,
+                alignItems:'flex-star',
+                paddingTop:10,
+                
+              },
+              btnTextConfirm:{
+                color:'#F0A202'
+              },
+              btnCancel:{
+                height:100,
+                alignItems:'flex-star',
+                paddingTop:10
+              },
+              dateText:{
+                fontSize:setSptext(18)
+              }
+            }}
+            onDateChange={(date) => setDate(date)}
+      />
+          
+          </View>
+          <View style={{ flexDirection: "row" ,justifyContent:'center',marginTop:setheight(57)}}>
+            <Button
+              title="取消"
+              titleStyle={{color:'#F0A202'}}
+              buttonStyle={styles.cancelbtn}
+              onPress={onCLoseModal}
+            />
+            <Button
+              title="確定"
+              titleStyle={{color:'#fff'}}
+              buttonStyle={styles.buttonstyle}
+              onPress={AcceptOrder}
+            />
+          </View>
+        </Card>
+      </View>
+    </Modal>
+
+    <Modal
+      visible={showConfirm}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}}
+    >
+       <View style={styles.containerStyle}>
+        <Card containerStyle={styles.card2style} 
+              dividerStyle={{width:0}} 
+              titleStyle={{fontSize:setSptext(17),color:'#656565'}}
+              title={"訂單已下訂 !"}
+        >
+            <Button
+            title="好"
+            titleStyle={{color:'#fff'}}
+            buttonStyle={styles.confirmbutton}
+            onPress={AcceptShowConfrim}
+            />
+        </Card>
+        </View>
+
+    </Modal>
+
+    
             </View>
-            <View >
+            <View style={{marginLeft:setWidth,marginTop:setheight(16)}}>
                 <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14}}>說明</Text>
-                        <Text style={{fontSize:14 ,marginLeft:32}}>{foodDetail}</Text>
+                    <Text style={{fontSize:setSptext(14)}}>說明</Text>
+                        <Text style={styles.listcontent}>{foodDetail}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14}}>期限</Text>
-                        <Text style={{fontSize:14 ,marginLeft:32}}>{date}</Text>
+                    <Text style={{fontSize:setSptext(14)}}>期限</Text>
+                        <Text style={styles.listcontent}>{date}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14}}>數量</Text>
-                        <Text style={{fontSize:14 ,marginLeft:32}}>{number}</Text>
+                    <Text style={{fontSize:setSptext(14)}}>數量</Text>
+                        <Text style={styles.listcontent}>{number}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
-                    <Text style={{fontSize:14}}>地點</Text>
-                    <Text style={{fontSize:14 ,marginLeft:32}}>台北市大安區和平東路360號</Text>
+                    <Text style={{fontSize:setSptext(14)}}>地點</Text>
+                    <Text style={styles.listcontent}>台北市大安區和平東路360號</Text>
                 </View>
             </View>
-            <View style={{height:372,justifyContent:'center',alignItems:'center'}}>
+            <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                 <MapView
                 region={region}
-                style={{width:340,height:340}}
+                style={styles.MAPStyle}
                 showsTraffic
                 provider="google"
+                customMapStyle={cusmapstyle}
                 >
                     <Marker
                     coordinate={marker.coord}
@@ -313,42 +427,103 @@ const FooddetailScreen = ({route,navigation}) =>{
             
             </View>
             </View>
+            
         </ScrollView>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    listcontent:{
+        fontSize:setSptext(14),
+        marginLeft:setWidth(32)
+    },
+    MAPStyle:{
+        width:setWidth(340),
+        height:setheight(340),
+        borderRadius:10,
+        marginTop:setheight(21)
+    },
+    cardstyle:{
+        paddingTop:setheight(40),
+        width:setWidth(287),
+        height:setheight(380),
+        borderRadius:20
+    },
+    card2style:{
+        paddingTop:setheight(40),
+        width:setWidth(287),
+        height:setheight(168),
+        borderRadius:20,
+        alignItems:'center'
+    },
+  containerStyle: {
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    position: "relative",
+    flex: 1,
+    justifyContent: "center",
+    alignItems:'center'
+    
+  },
+   confirmbutton:{ 
+    backgroundColor: '#f0A202', 
+    width: setWidth(103), 
+    height:setheight(42),
+    borderRadius:10
+},
+  buttonstyle:{ 
+      backgroundColor: '#f0A202', 
+      width: setWidth(103), 
+      height:setheight(42),
+      borderRadius:10,
+      marginLeft:setWidth(9)
+  },
+  cancelbtn:{
+    backgroundColor: '#fff', 
+    width: setWidth(103), 
+    height:setheight(42),
+    borderRadius:10,
+    borderColor:'#F0A202',
+    borderWidth:1,
+    marginRight:setWidth(9)
+
+  },
+  pickStyles:{
+    width:setWidth(223),
+    height:setheight(36),
+    marginTop:setheight(14),
+    right:setWidth(10)
+  },
     detailView:{
         backgroundColor:'#fff',
-        borderRadius:20,
-        top:-28
+        borderRadius:setWidth(20),
+        bottom:setheight(28),
+        alignItems:'center',
+        paddingTop:setheight(40)
 
     },
     Foodimg:{
-        width:375,
-        height:327,
-        paddingTop:48,
-        paddingLeft:16
+        width:devicewidth,
+        height:setheight(327),
+        paddingTop:setheight(44),
+        paddingLeft:setWidth(16)
     },
     Userphoto:{
-        width:64,
-        height:64,
-        borderRadius:35,
-        marginLeft:16
+        width:setWidth(64),
+        height:setheight(64),
+        borderRadius:setWidth(35)
     },
     FooddetailList:{
-        height:42,
-        width:375,
-        paddingLeft:19,
+        height:setheight(42),
+        width:setWidth(323),
         flexDirection:'row',
-        alignItems:'center'  
+        alignItems:'center'
     },
     SellerSection:{
         justifyContent:'flex-start',
         flexDirection:'row',
-        height:64,
-        alignItems:'center',
-        marginTop:32
+        height:setheight(70),
+        alignItems:'center'
     },
     Disandprice:{
         flexDirection:'row',
@@ -361,13 +536,23 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         justifyContent:'center',
-        width:163,
-        height:42,
-        marginLeft:16,
+        width:setWidth(153),
+        height:setheight(42),
         backgroundColor:'#F0A202',
-        borderRadius:10,
-        marginTop:32,
-        marginBottom:32
+        borderRadius:15,
+        marginLeft:setWidth(8),
+        marginTop:setheight(16)
+    },
+    btn2:{
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center',
+        width:setWidth(153),
+        height:setheight(42),
+        backgroundColor:'#F0A202',
+        borderRadius:15,
+        marginRight:setWidth(8),
+        marginTop:setheight(16)
     }
 
 

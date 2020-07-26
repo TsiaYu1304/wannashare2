@@ -24,14 +24,14 @@ const App=()=> {
 
   useEffect(()=>{
     const firebaseConfig = {
-    apiKey: "AIzaSyDWXrA3-aadNVL0AJZ_BAfiHkVtza7Z1zw",
-    authDomain: "iosapp-a5f28.firebaseapp.com",
-    databaseURL: "https://iosapp-a5f28.firebaseio.com",
-    projectId: "iosapp-a5f28",
-    storageBucket: "iosapp-a5f28.appspot.com",
-    messagingSenderId: "960935600720",
-    appId: "1:960935600720:web:8915136a1469f84f59a755",
-    measurementId: "G-KRCGHBV34G"
+      apiKey: "AIzaSyAdeuAc0I-QaJP_6u3iACaif5KuDC5tALA",
+      authDomain: "wannashareios.firebaseapp.com",
+      databaseURL: "https://wannashareios.firebaseio.com",
+      projectId: "wannashareios",
+      storageBucket: "wannashareios.appspot.com",
+      messagingSenderId: "594225041914",
+      appId: "1:594225041914:web:1d1fd4f662a3d17eaad443",
+      measurementId: "G-DD3EEX3G4L"
     };
     if(!firebase.apps.length){
       firebase.initializeApp(firebaseConfig); //避免firbase重複初始化
