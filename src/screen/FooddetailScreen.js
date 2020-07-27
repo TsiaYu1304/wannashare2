@@ -33,6 +33,7 @@ const FooddetailScreen = ({route,navigation}) =>{
     const { Myname } = firebase.auth().currentUser.displayName;
     const { MyUID } = firebase.auth().currentUser.uid;
     const { MyURL } = firebase.auth().currentUser.photoURL;
+    const { location } = route.params;
     const [Dataexist,setExist] = useState(false);
     const [Room_ID,setRoomID] = useState("");
     const [choseDate,setChoseDate] = useState(new Date());
@@ -155,9 +156,10 @@ const FooddetailScreen = ({route,navigation}) =>{
             SellerPhoto:SellerPhoto,
             img:img,
             date:date,
-            time:firebase.database.ServerValue.TIMESTAMP,
+            confirmtime:firebase.database.ServerValue.TIMESTAMP,  //訂單成立時間
             orderID:orderID,
-            price:price
+            price:price,
+            transtime:choseDate
           });
 
           //分享者 “分享訂單” “完成：未完成”
@@ -170,10 +172,11 @@ const FooddetailScreen = ({route,navigation}) =>{
             price:price,
             Buyerphoto:firebase.auth().currentUser.photoURL,
             BuyerID:firebase.auth().currentUser.uid,
-            Buyername:firebase.auth().currentUser.displayName
-,           date:date,
-            time:firebase.database.ServerValue.TIMESTAMP,
-            orderID:orderID
+            Buyername:firebase.auth().currentUser.displayName,
+            date:date,
+            confirmtime:firebase.database.ServerValue.TIMESTAMP, //訂單成立時間
+            orderID:orderID,
+            transtime:choseDate
           });
 
           firebase.database().ref("Users").child(sellerUID).child("Shareorder").child("foodshop").child(orderID).remove();
@@ -206,8 +209,8 @@ const FooddetailScreen = ({route,navigation}) =>{
     const [region,setRegion] = useState({
         longitude: 121.544637,
     latitude: 25.024624,
-    longitudeDelta: 0.01,
-    latitudeDelta: 0.02,
+    longitudeDelta: 0.008,
+    latitudeDelta: 0.008,
     });
 
     const [marker,setMaker] = useState({
@@ -406,7 +409,7 @@ const FooddetailScreen = ({route,navigation}) =>{
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={{fontSize:setSptext(14)}}>地點</Text>
-                    <Text style={styles.listcontent}>台北市大安區和平東路360號</Text>
+                    <Text style={styles.listcontent}>{location}</Text>
                 </View>
             </View>
             <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
@@ -421,7 +424,12 @@ const FooddetailScreen = ({route,navigation}) =>{
                     coordinate={marker.coord}
                     title={marker.name}
                     description={marker.address}
-                    />
+                    >
+                        <Image
+                        source={require('../icon/marker.png')}
+                        style={{width:setWidth(36),height:setheight(36)}}
+                        />
+                    </Marker>
                 </MapView>
                 
             

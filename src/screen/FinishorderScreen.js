@@ -24,15 +24,19 @@ const FinishorderScreen = ({navigation}) =>{
             if(snapshot.exists()){
                 snapshot.forEach(function(childSnapshot) {
                     firebaseFoodDetail.push({
-                        food:childSnapshot.val().food,
-                        name:childSnapshot.val().name,
-                        Buyerphoto:childSnapshot.val().Buyerphoto,
-                        img:childSnapshot.val().img,
-                        foodDetail:childSnapshot.val().foodDetail,
-                        number:childSnapshot.val().number,
-                        date:childSnapshot.val().date,
-                        orderID:childSnapshot.val().orderID,
-                        finish:childSnapshot.val().finish
+
+                    food:childSnapshot.val().food,
+                    name:childSnapshot.val().name,
+                    Buyerphoto:childSnapshot.val().Buyerphoto,
+                    Buyername: childSnapshot.val().Buyername,
+                    BuyerID: childSnapshot.val().BuyerID,
+                    img:childSnapshot.val().img,
+                    foodDetail:childSnapshot.val().foodDetail,
+                    number:childSnapshot.val().number,
+                    date:childSnapshot.val().date,
+                    orderID:childSnapshot.val().orderID,
+                    confirmtime:childSnapshot.val().confirmtime,
+                    transtime:childSnapshot.val().transtime
     
                     });
                 });
@@ -43,11 +47,10 @@ const FinishorderScreen = ({navigation}) =>{
 
         
     }
-    useEffect(()=>{
+  
+      useEffect(()=>{
         safefirebaseUnfinishShareorder();
       },[]);
-
-        
    
 
     return exist? (

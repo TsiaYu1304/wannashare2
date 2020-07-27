@@ -9,17 +9,36 @@ const deviceheight = Dimensions.get('window').height;
 const finifhordercard = ({post, navigation}) => {
     const { ordertime } = new Date(post.time).toString();
     return  (  
+        <TouchableOpacity 
+        onPress={()=>navigation.navigate('SellerFinishOrder',{
+            food:post.food,
+            name:post.name,
+            Buyerphoto:post.Buyerphoto,
+            Buyername: post.Buyername,
+            BuyerID: post.BuyerID,
+            img:post.img,
+            foodDetail:post.foodDetail,
+            number:post.number,
+            date:post.date,
+            orderID:post.orderID,
+            confirmtime:post.confirmtime,
+            transtime:post.transtime
+
+          })}
+        >
         <View style={styles.thumbnailContainerStyle}>
+            
             <Image
             source={{uri:post.img}}
             style={styles.imgstyle}
             />
             <View style={{marginLeft:setWidth(16)}}>
                 <Text style={{fontSize:setSptext(18),color:"#656565"}}>{post.food}</Text>
-                <Text style={{fontSize:setSptext(14),color:"#656565",marginTop:setheight(16)}}>領取時間:</Text>
+        <Text style={{fontSize:setSptext(14),color:"#656565",marginTop:setheight(16)}}>領取時間:{post.transtime}</Text>
             </View>
            
         </View>
+        </TouchableOpacity>
     )
 };
 
@@ -27,9 +46,10 @@ const styles = StyleSheet.create({
     thumbnailContainerStyle: {
         flexDirection: "row",
         justifyContent: "flex-start",
-        height:setheight(146),
+        height:setheight(116),
         paddingLeft:setWidth(26),
-        marginTop:setheight(26)
+        marginTop:setWidth(30)
+
     },
     imgstyle:{
         borderRadius:10,

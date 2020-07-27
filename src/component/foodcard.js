@@ -22,7 +22,8 @@ const foodcard = ({post, navigation}) => {
                 orderID:post.orderID,
                 date:post.date,
                 sellerUID:post.sellerUID,
-                price:post.price
+                price:post.price,
+                location:post.location
 
 
                 
@@ -47,9 +48,9 @@ const foodcard = ({post, navigation}) => {
                         source={require('../icon/pin.png')}
                         style={{width:setWidth(18),height:setheight(18) }}
                         />
-                        <Text style={{color:'#656565'}}>{post.distance}</Text>
+                        <Text style={{color:'#656565'}}>{post.location}</Text>
                     </View>
-                    <Text style={{marginTop:setheight(8),color:'#656565'}}>領取期限</Text>
+            <Text style={{marginTop:setheight(8),color:'#656565'}}>領取期限:{post.date}</Text>
                 </View>
             
             </View>

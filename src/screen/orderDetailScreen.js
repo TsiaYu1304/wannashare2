@@ -3,20 +3,18 @@ import {View, Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground,
 import MapView,{Marker} from "react-native-maps";
 import * as firebase from 'firebase'; 
 import '../component/ScreenUtil'
+import { Button } from "react-native-elements";
+import LottieView from "lottie-react-native";
 import QRCode from "react-native-qrcode-svg";
 import cusmapstyle from '../json/mapstyle.json'
 import { setheight, setWidth, setSptext } from "../component/ScreenUtil";
 import {Entypo, FontAwesome,AntDesign,MaterialCommunityIcons} from "@expo/vector-icons"
 const devicewidth = Dimensions.get('window').width;
 const deviceheight = Dimensions.get('window').height;
-//let db = firebase.firestore();
-//let Auth = firebase.auth();
 
-/*
-    
-*/
 
 const OrderDetailScreen = ({route,navigation}) =>{
+    const [finishModal,setfinishModal] = useState(false);
     const [showmodal,setShowmodal] = useState(false);
     const [useruid, setUid] = useState("");
     const { name } = route.params;
@@ -27,21 +25,21 @@ const OrderDetailScreen = ({route,navigation}) =>{
     const { orderID } = route.params;
     const { date } = route.params;
     const { number } = route.params;
-   
-    console.log(`id =  ${orderID}`)
-    function Addfinishorder() {
-        
-        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").child(food).set({
-            name:name,
-            food:food,
-            foodDetail:foodDetail,
-            SellerPhoto:SellerPhoto,
-            img:img,
-            date:date,
-            time:firebase.database.ServerValue.TIMESTAMP,
-            orderID:orderID
-          });
-      }
+    const { transtime} = route.params;
+
+    const HandleConfirm = () => {
+        setfinishModal(false)
+        navigation.navigate('User');  
+    }
+
+    useEffect(() => {
+        if(showmodal){
+            firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").on('child_removed', function(data) {
+                setShowmodal(false)
+                setfinishModal(true)
+            })
+        }
+      });
 
    
     const [region,setRegion] = useState({
@@ -120,7 +118,7 @@ const OrderDetailScreen = ({route,navigation}) =>{
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={styles.fooddetail_text}>領取時間</Text>
-                    <Text style={{fontSize:setSptext(18),color:'#656565'}}>2020/04/17/ 17:00</Text>
+                    <Text style={{fontSize:setSptext(18),color:'#656565'}}>{transtime}</Text>
                 </View>
                 <View style={styles.FooddetailList}>
                     <Text style={styles.fooddetail_text}>說明</Text>
@@ -151,7 +149,12 @@ const OrderDetailScreen = ({route,navigation}) =>{
                     coordinate={marker.coord}
                     title={marker.name}
                     description={marker.address}
-                    />
+                    >
+                        <Image
+                        source={require('../icon/marker.png')}
+                        style={{width:setWidth(36),height:setheight(36)}}
+                        />
+                    </Marker>
                 </MapView>
                 
             
@@ -194,11 +197,62 @@ const OrderDetailScreen = ({route,navigation}) =>{
                 </View>
                 </Modal>
             }
+
+            <Modal
+            visible={finishModal}
+            transparent
+            animationType="fade"
+            onRequestClose={() => {}}
+            >
+                <View style={styles.containerStyle}>
+                    <View style={styles.finish_cardstyle}>
+                    <LottieView
+                    style={{height: setheight(200),width:setWidth(200)}}
+                    source={require("../json/final.json")}
+                    autoPlay loop
+                    speed={1}
+                    />
+                    <Text style={{color:'#656565'}}>交易完成 !</Text>
+                    <Text style={{marginTop:setheight(8),color:'#656565'}}>獲得想享幣一枚</Text>
+
+                    <Button
+                        title="確定"
+                        titleStyle={{color:'#fff',fontSize:13}}
+                        buttonStyle={styles.confirmbutton}
+                        onPress={HandleConfirm}
+                        />
+                    </View>
+
+                </View>     
+        </Modal>
         </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
+    confirmbutton:{ 
+        backgroundColor: '#f0A202', 
+        width: setWidth(103), 
+        height:setheight(42),
+        borderRadius:10,
+        marginTop:setheight(24)
+    },
+    finish_cardstyle:{
+        paddingTop:setheight(40),
+        width:setWidth(287),
+        height:setheight(393),
+        borderRadius:20,
+        alignItems:'center',
+        backgroundColor:'#fff'
+    },
+    containerStyle: {
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        position: "relative",
+        flex: 1,
+        justifyContent: "center",
+        alignItems:'center'
+        
+      },
     modal_view_section:{
         backgroundColor:'#fff',
         flex:1 ,

@@ -50,9 +50,9 @@ const HomeScreen = ({navigation}) =>{
                         date:childSnapshot.val().date,
                         orderID:childSnapshot.val().orderID,
                         sellerUID:childSnapshot.val().sellerUID,
-                        price:childSnapshot.val().price
+                        price:childSnapshot.val().price,
+                        location:childSnapshot.val().location
                     });
-                    console.log(childSnapshot.val().food);
                 });
             });
         setFoodData(FoodDetail);

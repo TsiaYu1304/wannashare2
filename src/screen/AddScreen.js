@@ -1,13 +1,31 @@
 import React, { useState } from 'react';
-import { TouchableOpacity,StyleSheet, Text, View, Image, Dimensions, TextInput,ScrollView } from 'react-native';
+import { TouchableOpacity,StyleSheet, Text, View, Image, Dimensions, TextInput,ScrollView, Linking } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import * as firebase from 'firebase'; 
+import DatePicker from 'react-native-custom-datetimepicker'
 import {nanoid} from  'nanoid/async/index.native'
-import { set } from 'react-native-reanimated';
+import {MaterialCommunityIcons} from "@expo/vector-icons"
 
+import { setWidth, setSptext, setheight } from "../component/ScreenUtil";
+
+const devicewidth = Dimensions.get('window').width;
+const deviceheight = Dimensions.get('window').height;
+
+/*
+<TextInput
+                    placeholder="輸入期限"
+                    style={styles.add_text_detail_content}
+                    value={date}
+                    onChangeText={(date) =>setDate(date)}
+                    />
+*/
 var {height,width} = Dimensions.get('window');
 
 const Add = ({route,navigation}) => {
+    
+
+    const [btncolor,setBtncolor] = useState('#949494')
+    const [touch,setTouch] = useState(false);
     const [food,setFood] = useState("");
     const [foodDetail,setFoodDetail] = useState("");
     const [number,setNumber] = useState("");
@@ -17,6 +35,24 @@ const Add = ({route,navigation}) => {
     const [id,setId] = useState("");
     const [foodimgURL,setURL]=useState(""); 
     const [price,setPrice] = useState("免費");
+    const [choseDate,setChoseDate] = useState(new Date());
+
+    const changbtncolor = () => {
+        if(touch) {
+            setBtncolor('#949494')
+            setTouch(false)
+        }
+        else {
+            setBtncolor('#F0A202')
+            setTouch(true)
+        };
+    }
+
+    const UpdateDate =(date) => {
+      
+    
+        return setChoseDate(date);
+      }
 
     async function createID () {
         const iid = await nanoid(10);
@@ -55,11 +91,12 @@ const Add = ({route,navigation}) => {
             food:food,
             foodDetail:foodDetail,
             number:number,
-            date:date,
+            date:choseDate,
             img:imgURL,
-            time:firebase.database.ServerValue.TIMESTAMP,
             orderID:iid,
-            price:price
+            price:price,
+            location:location,
+            time:firebase.database.ServerValue.TIMESTAMP,
           });
 
           firebase.database().ref("Orders").child(iid
@@ -67,15 +104,17 @@ const Add = ({route,navigation}) => {
             ).set({
             name:firebase.auth().currentUser.displayName,
             SellerPhoto:firebase.auth().currentUser.photoURL,
+            sellerUID:firebase.auth().currentUser.uid,
+            img:imgURL,
+            orderID:iid,
             food:food,
             foodDetail:foodDetail,
             number:number,
-            date:date,
-            img:imgURL,
+            date:choseDate,
+            price:price,
+            location:location,
             time:firebase.database.ServerValue.TIMESTAMP,
-            orderID:iid,
-            sellerUID:firebase.auth().currentUser.uid,
-            price:price
+
           });
 
           navigation.goBack();  
@@ -86,8 +125,8 @@ const Add = ({route,navigation}) => {
 
     return (
         <View style={{flex:1}}>
-        <KeyboardAwareScrollView>
-        <ScrollView>
+        <KeyboardAwareScrollView style={{flex:1}}>
+        <ScrollView style={{flex:1}}>
             <View style={styles.add_img_box}>
                 <Image
                     style={styles.add_img}
@@ -116,12 +155,40 @@ const Add = ({route,navigation}) => {
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>期限</Text>
-                    <TextInput
-                    placeholder="輸入期限"
-                    style={styles.add_text_detail_content}
-                    value={date}
-                    onChangeText={(date) =>setDate(date)}
-                    />
+                    <DatePicker
+            removeUnderline = {true}
+            style={styles.pickStyles}
+            date={choseDate}
+            mode="date"
+            format="YYYY-MM-DD"
+            minDate="2020-08-31"
+            maxDate="2020-07-24"
+            locale="zh"
+            confirmBtnText="確定"
+            cancelBtnText="取消"
+            showIcon = {false}
+            customStyles={{
+              btnConfirm:{
+                height:100,
+                alignItems:'flex-star',
+                paddingTop:10,
+                
+              },
+              btnTextConfirm:{
+                color:'#F0A202'
+              },
+              btnCancel:{
+                height:100,
+                alignItems:'flex-star',
+                paddingTop:10
+              },
+              dateText:{
+                fontSize:setSptext(18)
+              }
+            }}
+            onDateChange={(date) => UpdateDate(date)}
+      />
+                    
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>數量</Text>
@@ -137,29 +204,47 @@ const Add = ({route,navigation}) => {
                     <View style={styles.add_text_detail_content}>
                         <View style={styles.add_text_detail_content_button}>
                             <Image
-                            style={{width:0.043*width,height:0.043*width}}
+                            style={{width:setWidth(16),height:setheight(16)}}
                             source={require('../img/pin.png')}
                             />
-                            <Text style={{paddingLeft:0.021*width,fontSize:14}}>設定地點</Text>
+                            <Text style={{fontSize:setSptext(14)}}>設定地點</Text>
                         </View>
                     </View>
                 </View>
                 <View style={styles.add_text_detail}>
-                    <Text
+                    <TextInput
+                        onChangeText={(location) =>setLocation(location)}
+                        placeholder='輸入地點'
                         style={
                             {
                                 paddingLeft: 0.11*width,
-                                fontSize: 17,
+                                fontSize: setSptext(18),
                             }
-                        }>台北市大安區和平東路2段360號</Text>
+                        }></TextInput>
                 </View>
+                <View style={{marginLeft:setWidth(45),flexDirection:'row',marginTop:setheight(36)}}>
+
+                    <TouchableOpacity onPress={changbtncolor}>
+                    <MaterialCommunityIcons name='circle-slice-8' size={setWidth(18)} color={btncolor} />
+                    </TouchableOpacity>
+
+                    <Text style={{marginLeft:setWidth(13),fontSize:setSptext(18),color:'#656565'}}>根據</Text>
+                    <TouchableOpacity onPress={()=> Linking.openURL("https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=l0040001")}>
+                            <Text style={{fontSize:setSptext(18),color:'#F0A202'}}>
+                                食安法
+                             </Text>
+                    </TouchableOpacity>
+                    <Text style={{fontSize:setSptext(18),color:'#656565'}}>, 不得分享超過有效期</Text>
+                </View>
+                <Text style={{marginLeft:setWidth(76),fontSize:setSptext(18),color:'#656565'}}>限或變質之食品, 否則後果自負</Text>
+                
                 
                 <TouchableOpacity 
                     onPress={()=>addunfinishShareorder2()}
                     style={styles.share_btn}
                     activeOpacity={0.5}
                     >
-                    <Text style={{color:'#fff',fontSize:22}}>分享</Text>
+                    <Text style={{color:'#fff',fontSize:setSptext(22)}}>分享</Text>
                 </TouchableOpacity>
                
 
@@ -174,56 +259,54 @@ const Add = ({route,navigation}) => {
 
 const styles = StyleSheet.create({
     add_img_box: {
-        width: width,
-        height: 0.4*height,
+        width: devicewidth,
         shadowColor: "#000",
         shadowOffset: { width: 3, height: 3 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
-        borderRadius: 20
+        borderRadius: 20,
+        position:'absolute'
 
     },
     add_text_box: {
-        width: width,
+        width: devicewidth,
         backgroundColor: '#fff',
         shadowColor: "#000",
         shadowOffset: { width: 3, height: 3 },
         shadowOpacity: 0.4,
         shadowRadius: 10,
         borderRadius: 25,
-        bottom:0.018*height,
-        paddingTop:0.05*height,
-        flex:1,
-        height:height*0.51
+        paddingTop:setheight(40),
+        marginTop:setheight(318)
     },
     add_img: {
-        width: width,
-        height: 0.4*height
+        width: devicewidth,
+        height: setheight(360)
 
     },
     add_text_detail: {
-        width:width,
+        width:devicewidth,
         flexDirection: "row",
         justifyContent: "flex-start",
-        marginTop:0.027*height
+        marginTop:setheight(20)
         
     },
     add_text_detail2: {
-        width:width,
+        width:devicewidth,
         flexDirection: "row",
         justifyContent: "flex-start",
-        marginTop:0.027*height,
-        height:0.07*height
+        marginTop:setheight(20),
+        height:setheight(20)
         
     },
     add_text_detail_name: {
-        paddingLeft: 0.11*width,
-        fontSize: 17,
+        paddingLeft: setWidth(40),
+        fontSize: setSptext(18),
     },
     add_text_detail_content: {
-        width:width*0.45,
-        marginLeft:0.23*width,
-        fontSize: 17,
+        width:setWidth(300),
+        marginLeft:setWidth(80),
+        fontSize: setSptext(18),
         alignSelf:'flex-start'
         
         
@@ -232,13 +315,18 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     share_btn:{
-        height:0.064*height,
+        height:setheight(52),
         backgroundColor:"#F0A202F0",
         alignItems:'center',
         justifyContent:'center',
-        marginTop:0.04*height,
-        top:18
-    }
+        marginTop:setheight(32),
+        borderRadius:10
+    },
+    pickStyles:{
+        width:setWidth(223),
+        height:setheight(36),
+        marginLeft:setWidth(82)
+      },
 
 });
 export default Add;

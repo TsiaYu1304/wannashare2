@@ -21,10 +21,9 @@ const FoodShophordercard = ({post, navigation}) => {
             style={styles.imgstyle}
             />
             <View style={{marginLeft:setWidth(12)}}>
-                <Text style={{fontSize:setSptext(18)}}>{post.food}</Text>
-                <Text style={styles.deadline}>領取期限:{post.date}前</Text>
-            </View>
-            <View style={styles.btnstyle}>
+                <View style={{flexDirection:'row'}}>
+                <Text style={{fontSize:setSptext(18),width:setWidth(140)}}>{post.food}</Text>
+                <View style={styles.btnstyle}>
                 <Button 
                 buttonStyle={{
                     backgroundColor:"#F0A202",
@@ -37,8 +36,13 @@ const FoodShophordercard = ({post, navigation}) => {
                     color:'#fff',
                     fontSize:setSptext(14)
                 }}
-                title="聯絡他" />
+                title="編輯" />
             </View>
+                </View>
+                
+                <Text style={styles.deadline}>領取期限:{post.date}前</Text>
+            </View>
+           
             </View>
         </View>
     )
@@ -71,8 +75,9 @@ const FoodShopScreen = ({navigation}) =>{
         
         
     };
-    
-    useEffect(()=>{
+
+   
+      useEffect(()=>{
         safefirebaseUnfinishShareorder();
       },[]);
 
@@ -114,27 +119,27 @@ const FoodShopScreen = ({navigation}) =>{
 const styles = StyleSheet.create({
     thumbnailContainerStyle: {
         flex:1,
-        alignItems:'center',
+        alignItems:'flex-start',
         justifyContent:'center',
-        height:140,
+        height:setheight(146),
         backgroundColor:'#fff',
     },
     content_section:{
-        flexDirection: "row"
+        flexDirection: "row",
+        justifyContent:'flex-start'
     },
     imgstyle:{
         borderRadius:10,
         height:setheight(88),
-        width:setWidth(88)
-    },
-    btnstyle:{
-        marginLeft:setWidth(7)
+        width:setWidth(88),
+        marginLeft:setWidth(26)
     },
     deadline:{
         marginTop:setheight(28),
         fontSize:setSptext(14)
         
-    }
+    },
+    
 });
 
 export default FoodShopScreen;

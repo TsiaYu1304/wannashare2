@@ -20,7 +20,9 @@ const Unfinishordercard = ({post, navigation}) => {
             foodDetail:post.foodDetail,
             number:post.number,
             date:post.date,
-            orderID:post.orderID
+            orderID:post.orderID,
+            confirmtime:post.confirmtime,
+            transtime:post.transtime
 
           })}>
         <View style={styles.thumbnailContainerStyle}>
@@ -65,7 +67,9 @@ const UnfinishorderScreen = ({navigation}) =>{
                         foodDetail:childSnapshot.val().foodDetail,
                         number:childSnapshot.val().number,
                         date:childSnapshot.val().date,
-                        orderID:childSnapshot.val().orderID
+                        orderID:childSnapshot.val().orderID,
+                        confirmtime:childSnapshot.val().confirmtime,
+                        transtime:childSnapshot.val().transtime
     
                     });
                 });
@@ -79,7 +83,10 @@ const UnfinishorderScreen = ({navigation}) =>{
 
         
     }
-    useEffect(()=>{
+    
+
+   
+      useEffect(()=>{
         safefirebaseUnfinishShareorder();
       },[]);
         

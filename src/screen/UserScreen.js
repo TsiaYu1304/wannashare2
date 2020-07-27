@@ -13,8 +13,6 @@ const devicewidth = Dimensions.get('window').width;
 const deviceheight = Dimensions.get('window').height;
 
 
-
-
 const Foodcard = ({post, navigation}) => {
     return(
         <View style={{height:setheight(120) }}>
@@ -26,8 +24,9 @@ const Foodcard = ({post, navigation}) => {
                 SellerPhoto:post.SellerPhoto,
                 foodDetail:post.foodDetail,
                 date:post.date,
-                time:post.time,
-                orderID:post.orderID  
+                confirmtime:post.confirmtime,
+                orderID:post.orderID,
+                transtime:post.transtime
 
               })}
         >
@@ -36,18 +35,68 @@ const Foodcard = ({post, navigation}) => {
             source={{uri:post.img}}
             style={{height:88,width:88,borderRadius:10,marginLeft:26}}
             />
-            <View style={{flexDirection:'column',marginTop:5,marginLeft:16}}>
-                <Text>{post.name}</Text>
-                <Text style={{fontSize:18,marginTop:8}}>{post.food}</Text>            
+            <View style={{marginTop:5,marginLeft:16}}>
+                <View style={{flexDirection:'row'}}>
+                    <View style={{width:setWidth(140)}}>
+                        <Text>{post.name}</Text>
+                        <Text style={{fontSize:18,marginTop:8}}>{post.food}</Text>            
+                    </View>
+                    <Button
+                    title="聯絡他"
+                    buttonStyle={{backgroundColor:'#F0A202',borderRadius:10,height:36,width:82}}
+                    titleStyle={{fontSize:14}}
+                    />
+                </View>
                 <Text style={{marginTop:8}}>領取期限:{post.date}前</Text>
             </View>
-            <View>
-                <Button
-                title="聯絡他"
-                buttonStyle={{backgroundColor:'#F0A202',borderRadius:10,height:36,width:82}}
-                titleStyle={{fontSize:14}}
-                />
+            
+
+        </View>
+        </TouchableOpacity>
+        
+    </View>
+
+    )
+}
+
+const FiniFoodcard = ({post, navigation}) => {
+    return(
+        <View style={{height:setheight(120) }}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('BuyerFinishOrder',{
+                food:post.food,
+                name:post.name,
+                img:post.img,
+                SellerPhoto:post.SellerPhoto,
+                foodDetail:post.foodDetail,
+                date:post.date,
+                confirmtime:post.confirmtime,
+                orderID:post.orderID,
+                transtime:post.transtime,
+                confirmtime:post.confirmtime
+
+              })}
+        >
+        <View style={{flexDirection:'row',marginTop:25}}>
+            <Image
+            source={{uri:post.img}}
+            style={{height:88,width:88,borderRadius:10,marginLeft:26}}
+            />
+            <View style={{marginTop:5,marginLeft:16}}>
+                <View style={{flexDirection:'row'}}>
+                    <View style={{width:setWidth(140)}}>
+                        <Text>{post.name}</Text>
+                        <Text style={{fontSize:18,marginTop:8}}>{post.food}</Text>            
+                    </View>
+                    <Button
+                    title="聯絡他"
+                    buttonStyle={{backgroundColor:'#F0A202',borderRadius:10,height:36,width:82}}
+                    titleStyle={{fontSize:14}}
+                    />
+                </View>
+                <Text style={{marginTop:8}}>領取期限:{post.date}前</Text>
             </View>
+            
 
         </View>
         </TouchableOpacity>
@@ -131,7 +180,7 @@ const User = ({navigation}) => {
         <FlatList
             data = {finifoodData}
             renderItem = {({item}) => 
-            <Foodcard
+            <FiniFoodcard
             post = {item}
             navigation = {navigation}
             />}
@@ -167,39 +216,27 @@ const User = ({navigation}) => {
         };
   
     useEffect(()=>{
-    readData();
+    readunFinishData();
+    readFinishData();
     },[]);
 
-    
-    const readData = async () => {
-        const FoodDetail = [];
+    useEffect(()=>{
+        listenData();
+    },[]);
+
+
+    const listenData = ()=>{
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").on('child_added',function(data){
+            readunFinishData();
+        });
+
+        firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").on('child_added',function(data){
+            readFinishData();
+        });
+    }
+
+    const readFinishData = async () => {
         const FiniFoodDetail = [];
-        
-        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
-            if(snapshot.exists()){
-                snapshot.forEach(function(childSnapshot) {
-                    FoodDetail.push({
-                        food:childSnapshot.val().food,
-                        name:childSnapshot.val().name,
-                        img:childSnapshot.val().img,
-                        SellerPhoto:childSnapshot.val().SellerPhoto,
-                        foodDetail:childSnapshot.val().foodDetail,
-                        date:childSnapshot.val().date,
-                        time:childSnapshot.val().time,
-                        orderID:childSnapshot.val().orderID,
-                        price:childSnapshot.val().price   
-                    });
-                  });
-                  setFoodData(FoodDetail);
-                  setOrder(true);
-            }else{
-                setOrder(false);
-            }
-            });
-
-        
-       
-
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").once('value', function(snapshot) {
             if(snapshot.exists()){
                 snapshot.forEach(function(childSnapshot) {
@@ -211,7 +248,9 @@ const User = ({navigation}) => {
                         foodDetail:childSnapshot.val().foodDetail,
                         date:childSnapshot.val().date,
                         time:childSnapshot.val().time,
-                        orderID:childSnapshot.val().orderID         
+                        orderID:childSnapshot.val().orderID  ,
+                        transtime:childSnapshot.val().transtime,
+                        confirmtime:childSnapshot.val().confirmtime      
                     });
                   });
                   setFinifoodData(FiniFoodDetail);
@@ -222,6 +261,34 @@ const User = ({navigation}) => {
             });
             
        
+  
+    };
+
+    const readunFinishData = async () => {
+        const FoodDetail = [];
+        await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
+            if(snapshot.exists()){
+                snapshot.forEach(function(childSnapshot) {
+                    FoodDetail.push({
+                        food:childSnapshot.val().food,
+                        name:childSnapshot.val().name,
+                        img:childSnapshot.val().img,
+                        SellerPhoto:childSnapshot.val().SellerPhoto,
+                        foodDetail:childSnapshot.val().foodDetail,
+                        date:childSnapshot.val().date,
+                        confirmtime:childSnapshot.val().confirmtime,  //下定訂單時間
+                        transtime:childSnapshot.val().transtime,
+                        orderID:childSnapshot.val().orderID,
+                        price:childSnapshot.val().price   
+                    });
+                    console.log(childSnapshot.val().transtime)
+                  });
+                  setFoodData(FoodDetail);
+                  setOrder(true);
+            }else{
+                setOrder(false);
+            }
+            });
   
     };
 
@@ -375,7 +442,7 @@ const styles = StyleSheet.create({
     btn4_view:{
         flexDirection:'column',
         alignItems:'center',
-        paddingLeft:19
+        paddingLeft:setWidth(19)
     },
     btn4_touchable:{
         width:setWidth(55),

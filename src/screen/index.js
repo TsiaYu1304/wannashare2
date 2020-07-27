@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
+
+import SellerFinishOrder from "./SellerFinishorder"
 import TakePicture from "../screen/TakePictureScreen";
 import SigninScreen from "./SigninScreen";
 import SignupScreen from "./SignupScreen";
@@ -26,7 +28,8 @@ import OrderDetailscreen from "./orderDetailScreen";
 import SellerDetailScreen from "./SellerOrderDetail";
 import chatroomScreen from "./ChatroomScreen"
 import ChatroomScreen from "./ChatroomScreen";
-import FoodShopScreen from "./foodshopscreen"
+import FoodShopScreen from "./foodshopscreen";
+import BuyerFinishOrder from "./BuyerFinishOrder"
 
 
 
@@ -92,6 +95,8 @@ export const HomeStackTabNavigation = ({navigation}) => {
             <Stack.Screen name="ChatRoom" component={ChatroomScreen} options={{title:"聊天室",headerBackTitleVisible:false}} />
             <Stack.Screen name="OrderDetail" component={OrderDetailscreen} options={{title:"詳細資訊",headerShown: false}} />
             <Stack.Screen name="SellerOrderDetail" component={SellerDetailScreen} options={{title:"詳細",headerShown: false}} />
+            <Stack.Screen name="SellerFinishOrder" component={SellerFinishOrder} options={{title:"詳細成功訂單",headerShown:false}}/>
+            <Stack.Screen name="BuyerFinishOrder" component={BuyerFinishOrder} options={{title:"詳細成功訂單",headerShown:false}}/>
         </Stack.Navigator>
     );
 };
@@ -144,7 +149,6 @@ export const PostStackNavigation = ({navigation}) => {
                 headerTitleStyle:{
                     color:'#fff'
                 },
-                headerRight:()=>(<AddRightHeader/>),
                 headerBackTitleVisible:false,
                 headerTintColor:'#fff'
             }}
