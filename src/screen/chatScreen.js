@@ -1,5 +1,19 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity,Switch } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, Dimensions,TouchableOpacity,Switch } from 'react-native';
+import { setWidth,setheight,setSptext } from '../component/ScreenUtil';
+
+
+
+const chatScreen = ({navigation}) => {
+    return(
+        <View style={{backgroundColor:'#fff', flex:1,alignItems:'center'}}>
+            <Image
+            source={require('../img/No_chat.png')}
+            style={{marginTop:setheight(120),width:setWidth(235),height:setheight(235)}}/>
+            <Text style={{color:'#656565',fontSize:setSptext(18)}}>目前尚無優惠券</Text>
+        </View>
+    )
+}
 
 const ChatRoomCard = ({navigation}) =>{
     return (
@@ -109,4 +123,4 @@ const chat = ({navigation}) => {
 const styles = StyleSheet.create({
 
 });
-export default chat;
+export default chatScreen;

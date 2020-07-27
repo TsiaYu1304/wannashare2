@@ -1,10 +1,25 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { setWidth,setheight,setSptext } from '../component/ScreenUtil';
+
+
+
+const couponScreen = ({navigation}) => {
+    return(
+        <View style={{backgroundColor:'#fff', flex:1,alignItems:'center'}}>
+            <Image
+            source={require('../img/No_coupon.png')}
+            style={{marginTop:setheight(120),width:setWidth(235),height:setheight(235)}}/>
+            <Text style={{color:'#656565',fontSize:setSptext(18)}}>目前尚無優惠券</Text>
+        </View>
+    )
+}
+
+/*
 
 const coupon = ({navigation}) => {
     return (
         <View style={{backgroundColor:'#fff',height:8850}}>
-            {/* headerStart-------------------------- */}
             <View style={{
                 height: 88,
                 backgroundColor: '#F0A202',
@@ -40,7 +55,6 @@ const coupon = ({navigation}) => {
                     width: 42
                 }}></View>
             </View>
-            {/* headerEnd-------------------------- */}
 
             <ScrollView style={{ height: 750 }}>
                 <View style={{
@@ -87,7 +101,6 @@ const coupon = ({navigation}) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-{/* ============================== */}
                 <View style={{
                     height: 146,
                     //backgroundColor: 'tomato',
@@ -132,7 +145,6 @@ const coupon = ({navigation}) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-{/* ====================== */}
                 <View style={{
                     height: 146,
                     //backgroundColor: 'tomato',
@@ -184,7 +196,12 @@ const coupon = ({navigation}) => {
     );
 }
 
+*/
+
 const styles = StyleSheet.create({
 
 });
-export default coupon;
+
+
+export default couponScreen;
+

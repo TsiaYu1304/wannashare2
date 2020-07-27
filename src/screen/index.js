@@ -90,8 +90,28 @@ export const HomeStackTabNavigation = ({navigation}) => {
                 headerTintColor:'#fff'
                 
             }}/>
-            <Stack.Screen name="Coupon" component={Coupon} options={{title:"優惠券",headerShown: false}} />
-            <Stack.Screen name="Chat" component={Chat} options={{title:"聊天",headerShown: false}} />
+            <Stack.Screen name="Coupon" component={Coupon} options={{
+                title:'優惠券',
+                headerTitleStyle:{color:'#fff'},
+                headerStyle:{
+                    backgroundColor:"#F0A202F0",
+                    height:88
+                },
+                headerBackTitleVisible:false,
+                headerTintColor:'#fff'
+                
+            }} />
+            <Stack.Screen name="Chat" component={Chat} options={{
+                title:'聊天紀錄',
+                headerTitleStyle:{color:'#fff'},
+                headerStyle:{
+                    backgroundColor:"#F0A202F0",
+                    height:88
+                },
+                headerBackTitleVisible:false,
+                headerTintColor:'#fff'
+                
+            }} />
             <Stack.Screen name="ChatRoom" component={ChatroomScreen} options={{title:"聊天室",headerBackTitleVisible:false}} />
             <Stack.Screen name="OrderDetail" component={OrderDetailscreen} options={{title:"詳細資訊",headerShown: false}} />
             <Stack.Screen name="SellerOrderDetail" component={SellerDetailScreen} options={{title:"詳細",headerShown: false}} />

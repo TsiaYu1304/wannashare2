@@ -80,6 +80,11 @@ const SignupScreen = ({navigation}) =>{
               photoURL:"https://github.com/TsiaYu1304/0721_wannashare/blob/master/src/img/IDphoto.png?raw=true"
           })
 
+
+         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).set({
+             sharecoin:0
+         })
+
           setUser({...user,name:firebase.auth().currentUser.displayName})
           setUser({...user,email:firebase.auth().currentUser.email})
           
