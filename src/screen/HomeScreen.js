@@ -1,7 +1,7 @@
 import React ,{useState,useEffect,useContext}from "react";
 import {View, Text, FlatList, Button, TextInput ,Image,ScrollView,StyleSheet,ImageBackground,Dimensions,PixelRatio} from "react-native"
 import Shopdetail from "../json/Shopdetail.json"
-import Fooddata from "../json/fooddetail.json"
+import Fooddata from "../json/shopfooddetail.json"
 import ShopFooddata from "../json/shopfooddetail.json"
 import Foodcard from "../component/foodcard.js"
 import * as firebase from 'firebase';
