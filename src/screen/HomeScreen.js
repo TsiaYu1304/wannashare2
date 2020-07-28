@@ -13,10 +13,8 @@ import { setSptext, scaleSize, setheight, setWidth } from "../component/ScreenUt
 
 const devicewidth = Dimensions.get('window').width;
 const deviceheight = Dimensions.get('window').height;
-
-//let Auth = firebase.auth();
  
-const HomeScreen = ({navigation}) =>{
+const HomeScreen = ({navigation}) => {
     const [name,setName] = useState("");
 
     const {userState} = useContext(StoreContext);
@@ -121,7 +119,7 @@ const HomeScreen = ({navigation}) =>{
     }
     return (
         <View style={{flex:1,backgroundColor:'#FDF8E1'}}>
-            <ScrollView>
+            
             <View style={styles.Top_section}>
             <ImageBackground source={require('../img/homebg1.png')} style = {{width:setWidth(375),height:setheight(325)}}>
                 <View style={{height:setheight(70),paddingTop:setheight(22),paddingLeft:0.07*devicewidth}}>
@@ -196,7 +194,7 @@ const HomeScreen = ({navigation}) =>{
                 </TouchableOpacity>
             </View>
             <UserShopFoodcard navigation = {navigation}/>
-        </ScrollView>
+       
              
         </View>
     )

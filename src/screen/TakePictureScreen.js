@@ -1,7 +1,7 @@
 import React, { useState, useEffect ,useRef} from 'react';
 import { Text, View, TouchableOpacity,Modal ,Image, Dimensions,StyleSheet} from 'react-native';
 import { Camera } from 'expo-camera';
-import {Entypo, FontAwesome,AntDesign,MaterialCommunityIcons} from "@expo/vector-icons"
+import {AntDesign,MaterialCommunityIcons} from "@expo/vector-icons"
 import { setheight, setWidth, setSptext ,scaleSize} from '../component/ScreenUtil';
 import { color } from 'react-native-reanimated';
 
@@ -40,12 +40,14 @@ const TakepictureScreen = ({navigation}) =>{
      setOpen(true);
   }
 
+  
   function navtoAdd(){
     navigation.navigate('Add',{
         capturePhoto:capturePhoto
       })
    setOpen(false);
 }
+
   
   return (
     <View style={{ flex: 1 ,backgroundColor:'#fff'}}>

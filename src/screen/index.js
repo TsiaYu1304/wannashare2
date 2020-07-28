@@ -10,7 +10,6 @@ import SellerFinishOrder from "./SellerFinishorder"
 import TakePicture from "../screen/TakePictureScreen";
 import SigninScreen from "./SigninScreen";
 import SignupScreen from "./SignupScreen";
-import HomeTabNavigation from "../navigations/MainTab.js";
 import HomeScreen from "../screen/HomeScreen.js";
 import SearchScreen from "../screen/SearchScreen.js";
 import PostScreen from "../screen/PostScreen";
@@ -26,7 +25,6 @@ import Chat from "../screen/chatScreen";
 import intro from "../screen/GuideScreen";
 import OrderDetailscreen from "./orderDetailScreen";
 import SellerDetailScreen from "./SellerOrderDetail";
-import chatroomScreen from "./ChatroomScreen"
 import ChatroomScreen from "./ChatroomScreen";
 import FoodShopScreen from "./foodshopscreen";
 import BuyerFinishOrder from "./BuyerFinishOrder"
@@ -74,8 +72,6 @@ export const HomeStackTabNavigation = ({navigation}) => {
                     height:88
                 },
                 title:'吐司',
-                
-               
                 headerBackImage:()=> (<BackImage/>)
             }}/>
             <Stack.Screen name="Coin" component={ICanUse} options={{title:"想享幣",headerShown: false}} />
@@ -117,6 +113,21 @@ export const HomeStackTabNavigation = ({navigation}) => {
             <Stack.Screen name="SellerOrderDetail" component={SellerDetailScreen} options={{title:"詳細",headerShown: false}} />
             <Stack.Screen name="SellerFinishOrder" component={SellerFinishOrder} options={{title:"詳細成功訂單",headerShown:false}}/>
             <Stack.Screen name="BuyerFinishOrder" component={BuyerFinishOrder} options={{title:"詳細成功訂單",headerShown:false}}/>
+            <Stack.Screen name="Add" component = {AddScreen}
+           
+            options={{
+                title:'新增',
+                headerStyle:{
+                    backgroundColor:'#F0A202F0',
+                
+                },
+                headerTitleStyle:{
+                    color:'#fff'
+                },
+                headerBackTitleVisible:false,
+                headerTintColor:'#fff'
+            }}
+            />
         </Stack.Navigator>
     );
 };
@@ -158,21 +169,7 @@ export const PostStackNavigation = ({navigation}) => {
                 headerShown: false
             }}
             />
-            <Stack.Screen name="Add" component = {AddScreen}
-           
-            options={{
-                title:'新增',
-                headerStyle:{
-                    backgroundColor:'#F0A202F0',
-                
-                },
-                headerTitleStyle:{
-                    color:'#fff'
-                },
-                headerBackTitleVisible:false,
-                headerTintColor:'#fff'
-            }}
-            />
+            
         </Stack.Navigator>
     )
 }
@@ -223,21 +220,70 @@ export const OrderTabNavigation = ({navigation}) => {
     )
 }
 
-const Chatbtn = () => 
-{
+export const HomeTabNavigation = () => {
+    
     return(
-        <View style={{flexDirection:'row'}}>
-        <Image
-        source ={require('../icon/chat-bubble.png')}
-        style={{width:25,height:24,marginRight:16}}
-        />
-        <Image
-        source ={require('../icon/settings.png')}
-        style={{width:24,height:24,marginRight:16}}
-        />
-        </View>
+            <Tab.Navigator
+            tabBarOptions={{
+                showLabel:false
+            }}
+            >
+               <Tab.Screen 
+               name= "Home" 
+               component={HomeStackNavigation}
+               options={{
+                   tabBarIcon:({focused}) => (
+                       focused
+                       ? <Image source={require('../icon/internet.png')} style={{height:24,width:24 }}  />
+                       : <Image source={require('../icon/home.png')} style={{height:24,width:24 }}  />
+                   )
+               }} 
+               />
+               <Tab.Screen 
+               name="Post" 
+               component={PostStackNavigation} 
+               
+               options={{
+                
+                tabBarIcon:({focused}) => (
+                    focused
+                    ? <Image source={require('../icon/plus_yellow.png')} style={{height:24,width:24 }}  />
+                    : <Image source={require('../icon/plus.png')} style={{height:24,width:24 }}  />
+                ),
+                tabBarVisible:false
+            }} 
+               />
+               <Tab.Screen 
+               name = "Order" 
+               component={OrderStackNavigation}
+               options={{
+                tabBarIcon:({focused}) => (
+                    focused
+                    ? <Image source={require('../icon/menu2.png')} style={{height:24,width:24 }}  />
+                    : <Image source={require('../icon/menu.png')} style={{height:24,width:24 }}  />
+                )
+            }} 
+               />
+               <Tab.Screen 
+               name = "User" 
+               component={UserScreen}
+               options={{
+                
+                tabBarIcon:({focused}) => (
+                    focused
+                    ? <Image source={require('../icon/user_yellow.png')} style={{height:24,width:24 }}  />
+                    : <Image source={require('../icon/user_black.png')} style={{height:24,width:24 }}  />
+                )
+            }} 
+               />
+            </Tab.Navigator>
     )
+
 }
+
+
+
+/*
 export const UserNavigation = ({navigation}) => {
     return(
         <Stack.Navigator>
@@ -255,5 +301,7 @@ export const UserNavigation = ({navigation}) => {
         </Stack.Navigator>
     )
 }
+
+*/
 
 //主頁面

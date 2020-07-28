@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { TouchableOpacity,StyleSheet, Text, View, Image, Dimensions, TextInput,ScrollView, Linking } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import * as firebase from 'firebase'; 
-import DatePicker from 'react-native-custom-datetimepicker'
+import * as firebase from 'firebase';
 import {nanoid} from  'nanoid/async/index.native'
 import {MaterialCommunityIcons} from "@expo/vector-icons"
 
@@ -35,7 +34,7 @@ const Add = ({route,navigation}) => {
     const [id,setId] = useState("");
     const [foodimgURL,setURL]=useState(""); 
     const [price,setPrice] = useState("免費");
-    const [choseDate,setChoseDate] = useState(new Date());
+    const [choseDate,setChoseDate] = useState("");
 
     const changbtncolor = () => {
         if(touch) {
@@ -71,8 +70,23 @@ const Add = ({route,navigation}) => {
         const uri = firebase.storage().ref(iid).child("foodpicture").getDownloadURL();
         console.log(`url=${uri}`);
     }    
-    async function addunfinishShareorder2 () {
-        const iid = await nanoid(10);
+
+    const uplLoadImage = async() =>{
+        const blob = await new Promise((resolve,reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                resolve(xhr.response);
+            }
+            xhr.onerror = function(e){
+                console.log(e);
+                reject(new TypeError('NetWork request faild'));
+            };
+            xhr.responseType = 'blob';
+            xhr.open('Get',uri,true);
+            xhr.send(null);
+        });
+
+            /*
         const response = await fetch(capturePhoto.uri);
         const blob = await response.blob();
         const ref = firebase.storage().ref(iid).child("foodpicture")
@@ -80,12 +94,31 @@ const Add = ({route,navigation}) => {
         //blob.close();
         const imgURL = await (await snapshot).ref.getDownloadURL();
        
-       console.log(`iid=${iid}`);
+        */
+    }
+
+    async function addunfinishShareorder2 () {
+        const iid = await nanoid(10);
+        
+       const blob = await new Promise((resolve,reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            resolve(xhr.response);
+        }
+        xhr.onerror = function(e){
+            console.log(e);
+            reject(new TypeError('NetWork request faild'));
+        };
+        xhr.responseType = 'blob';
+        xhr.open('Get',capturePhoto.uri,true);
+        xhr.send(null);
+    });
+        const ref = firebase.storage().ref(iid).child("foodpicture")
+        var snapshot =  ref.put(blob);
+        const imgURL = await (await snapshot).ref.getDownloadURL();
+
        console.log(`iid=${imgURL}`);
        
-       //console.log(`URL=${firebase.storage().ref(iid).child("foodpicture").getDownloadURL()}`); 
-       
-
         firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("foodshop").child(iid).set({
             name:firebase.auth().currentUser.displayName,
             food:food,
@@ -155,39 +188,12 @@ const Add = ({route,navigation}) => {
                 </View>
                 <View style={styles.add_text_detail}>
                     <Text style={styles.add_text_detail_name}>期限</Text>
-                    <DatePicker
-            removeUnderline = {true}
-            style={styles.pickStyles}
-            date={choseDate}
-            mode="date"
-            format="YYYY-MM-DD"
-            minDate="2020-08-31"
-            maxDate="2020-07-24"
-            locale="zh"
-            confirmBtnText="確定"
-            cancelBtnText="取消"
-            showIcon = {false}
-            customStyles={{
-              btnConfirm:{
-                height:100,
-                alignItems:'flex-star',
-                paddingTop:10,
-                
-              },
-              btnTextConfirm:{
-                color:'#F0A202'
-              },
-              btnCancel:{
-                height:100,
-                alignItems:'flex-star',
-                paddingTop:10
-              },
-              dateText:{
-                fontSize:setSptext(18)
-              }
-            }}
-            onDateChange={(date) => UpdateDate(date)}
-      />
+                    <TextInput
+                    placeholder="2020-08-11"
+                    style={styles.add_text_detail_content}
+                    value={choseDate}
+                    onChangeText={(choseDate) =>setChoseDate(choseDate)}
+                    />
                     
                 </View>
                 <View style={styles.add_text_detail}>

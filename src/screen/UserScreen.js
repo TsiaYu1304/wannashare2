@@ -1,6 +1,5 @@
 import React,{useContext, useState,useEffect}from 'react';
-import { ActionSheetIOS,StyleSheet, Text, View, Image, ImageBackground ,TouchableOpacity,Dimensions,FlatList,ScrollView} from 'react-native';
-import { OrderTabNavigation} from "./index"
+import { ActionSheetIOS,StyleSheet, Text, View, Image, ImageBackground ,TouchableOpacity,Dimensions,FlatList} from 'react-native';
 import {Button} from "react-native-elements";
 import {StoreContext}from "../store/UserStore.js";
 import { TabView, SceneMap ,TabBar} from 'react-native-tab-view';
@@ -135,11 +134,23 @@ const User = ({navigation}) => {
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync();
 
-    const response = await fetch(pickerResult.uri);
-    const blob = await response.blob();
-    const ref = firebase.storage().ref(firebase.auth().currentUser.uid)
-    var snapshot =  ref.put(blob);
-    const imgURL = await (await snapshot).ref.getDownloadURL();
+    const blob = await new Promise((resolve,reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            resolve(xhr.response);
+        }
+        xhr.onerror = function(e){
+            console.log(e);
+            reject(new TypeError('NetWork request faild'));
+        };
+        xhr.responseType = 'blob';
+        xhr.open('Get',pickerResult.uri,true);
+        xhr.send(null);
+    });
+        const ref = firebase.storage().ref(firebase.auth().currentUser.uid)
+        var snapshot =  ref.put(blob);
+        const imgURL = await (await snapshot).ref.getDownloadURL();
+
 
     await firebase.auth().currentUser.updateProfile({
         photoURL:imgURL
@@ -384,7 +395,7 @@ const User = ({navigation}) => {
                 <Text style={styles.user_profile_name_}>{user.email}</Text>
                 </View>
             </View>
-            <ScrollView style={styles.order_view}>
+            <View style={styles.order_view}>
                 
             <TabView
             style={{top:setheight(13)}}
@@ -402,7 +413,7 @@ const User = ({navigation}) => {
             }
 
             />
-            </ScrollView>
+            </View>
             
         </View>
     );
@@ -411,7 +422,8 @@ const styles = StyleSheet.create({
     order_view:{
         backgroundColor:'#fff',
         borderTopStartRadius:20,
-        borderTopEndRadius:20
+        borderTopEndRadius:20,
+        flex:1
         
     },
     user_profile: {

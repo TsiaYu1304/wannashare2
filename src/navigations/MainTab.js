@@ -2,24 +2,17 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image } from "react-native";
-import { PostStackNavigation, OrderStackNavigation,OrderTabNavigation ,HomeStackNavigation ,UserNavigation} from "../screen"
+import { OrderStackNavigation,PostStackNavigation, OrderTabNavigation ,HomeStackNavigation ,UserNavigation} from "../screen"
 import HomeScreen from "../screen/HomeScreen";
 import AddScreen from "../screen/AddScreen.js";
 import TakePicture from "../screen/TakePictureScreen"
 import TakepictureScreen from "../screen/TakePictureScreen";
+import UserScreen from "../screen/UserScreen"
 
 const Tab = createBottomTabNavigator();
 
 const HomeTabNavigation = () => {
-    const TakePhoto =() =>{
-        ImagePicker.openCamera({
-            width: 300,
-            height: 400,
-            cropping: true,
-          }).then(image => {
-            console.log(image);
-          });
-    }
+    
     return(
             <Tab.Navigator
             tabBarOptions={{
@@ -40,12 +33,7 @@ const HomeTabNavigation = () => {
                <Tab.Screen 
                name="Post" 
                component={PostStackNavigation} 
-               listeners={({navigation,route})=>({
-                tabPress: () =>{
-                    //TakePhoto();
-                    //navigation.navigate('Add');
-                }
-            })}
+               
                options={{
                 
                 tabBarIcon:({focused}) => (
@@ -69,8 +57,9 @@ const HomeTabNavigation = () => {
                />
                <Tab.Screen 
                name = "User" 
-               component={UserNavigation}
+               component={UserScreen}
                options={{
+                
                 tabBarIcon:({focused}) => (
                     focused
                     ? <Image source={require('../icon/user_yellow.png')} style={{height:24,width:24 }}  />

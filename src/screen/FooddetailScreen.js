@@ -1,12 +1,8 @@
 import React,{useState,useEffect} from "react";
 import {View,TextInput ,Modal,Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground,Dimensions} from "react-native"
 import { Card, Button } from "react-native-elements";
-import DatePicker from 'react-native-custom-datetimepicker'
-import fooddata from "../json/fooddetail.json";
-import { round } from "react-native-reanimated";
 import MapView,{Marker} from "react-native-maps";
 import cusmapstyle from '../json/mapstyle.json'
-import Confirm from "../component/Confirm.js"
 import * as firebase from 'firebase'; 
 import {nanoid} from  'nanoid/async/index.native'
 import { setWidth, setheight, setSptext } from '../component/ScreenUtil';
@@ -36,14 +32,8 @@ const FooddetailScreen = ({route,navigation}) =>{
     const { location } = route.params;
     const [Dataexist,setExist] = useState(false);
     const [Room_ID,setRoomID] = useState("");
-    const [choseDate,setChoseDate] = useState(new Date());
+    const [choseDate,setChoseDate] = useState("");
 
-    const setDate =(date) => {
-      
-      console.log(date);
-  
-      return setChoseDate(date);
-    }
     //建立聊天室資料庫
     const BuildChatRoominUserData = (ID) =>{
         //買家方增加聊天室
@@ -185,8 +175,8 @@ const FooddetailScreen = ({route,navigation}) =>{
   
     //Modal
     const AcceptShowConfrim = () => {
-        setShowConfirm(false)
-        navigation.navigate('User')   
+        setShowConfirm(false);
+        navigation.navigate('User')
     }
 
     const AcceptOrder = () => { //確認下單
@@ -314,41 +304,15 @@ const FooddetailScreen = ({route,navigation}) =>{
           </View>
           <Text style={{color:'#656565',marginTop:setheight(53),fontSize:setSptext(18),marginLeft:setWidth(18)}}>領取時間</Text>
           
-          <View style={{flexDirection:'row-reverse',alignItems:'center'}}>
+          <View style={{flexDirection:'row',alignItems:'center'}}>
+          <TextInput
+                    style={{fontSize:setSptext(18),color:'#656565',marginTop:setheight(16),marginLeft:setWidth(18)}}
+                    placeholder="2020-08-11 16:00"
+                    value={choseDate}
+                    onChangeText={(choseDate) =>setChoseDate(choseDate)}
+                    />
           <Fontisto name="date" size={setheight(24)} color='#000' style={{left:setWidth(24),top:setheight(8)}} /> 
-          <DatePicker
-            removeUnderline = {true}
-            style={styles.pickStyles}
-            date={choseDate}
-            mode="datetime"
-            format="YYYY-MM-DD a h:mm"
-            minDate="2020-08-31"
-            maxDate="2020-07-24"
-            locale="zh"
-            confirmBtnText="確定"
-            cancelBtnText="取消"
-            showIcon = {false}
-            customStyles={{
-              btnConfirm:{
-                height:100,
-                alignItems:'flex-star',
-                paddingTop:10,
-                
-              },
-              btnTextConfirm:{
-                color:'#F0A202'
-              },
-              btnCancel:{
-                height:100,
-                alignItems:'flex-star',
-                paddingTop:10
-              },
-              dateText:{
-                fontSize:setSptext(18)
-              }
-            }}
-            onDateChange={(date) => setDate(date)}
-      />
+                    
           
           </View>
           <View style={{ flexDirection: "row" ,justifyContent:'center',marginTop:setheight(57)}}>
