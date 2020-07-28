@@ -23,6 +23,7 @@ const HomeTabNavigation = () => {
                name= "Home" 
                component={HomeStackNavigation}
                options={{
+                   tabBarLabel:"主頁",
                    tabBarIcon:({focused}) => (
                        focused
                        ? <Image source={require('../icon/internet.png')} style={{height:24,width:24 }}  />
@@ -35,7 +36,7 @@ const HomeTabNavigation = () => {
                component={PostStackNavigation} 
                
                options={{
-                
+                tabBarLabel:"主頁",
                 tabBarIcon:({focused}) => (
                     focused
                     ? <Image source={require('../icon/plus_yellow.png')} style={{height:24,width:24 }}  />
@@ -48,6 +49,7 @@ const HomeTabNavigation = () => {
                name = "Order" 
                component={OrderStackNavigation}
                options={{
+                tabBarLabel:"主頁",
                 tabBarIcon:({focused}) => (
                     focused
                     ? <Image source={require('../icon/menu2.png')} style={{height:24,width:24 }}  />
@@ -59,7 +61,7 @@ const HomeTabNavigation = () => {
                name = "User" 
                component={UserScreen}
                options={{
-                
+                tabBarLabel:"主頁",
                 tabBarIcon:({focused}) => (
                     focused
                     ? <Image source={require('../icon/user_yellow.png')} style={{height:24,width:24 }}  />

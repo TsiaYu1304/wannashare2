@@ -123,7 +123,7 @@ const HomeScreen = ({navigation}) => {
             <View style={styles.Top_section}>
             <ImageBackground source={require('../img/homebg1.png')} style = {{width:setWidth(375),height:setheight(325)}}>
                 <View style={{height:setheight(70),paddingTop:setheight(22),paddingLeft:0.07*devicewidth}}>
-                <Text style={{color:'#fff',fontSize:22}}>Hello,{name}!</Text>
+                <Text style={{color:'#fff',fontSize:22}}>Hello!</Text>
                     <Text style={{color:'#fff',fontSize:14,marginTop:0.001*deviceheight}}>歡迎使用想享!</Text>
                 </View>
                 <View style={{marginTop:setheight(16),flexDirection:'row',justifyContent:'center'}}>
