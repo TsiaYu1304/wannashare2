@@ -1,15 +1,7 @@
 import React,{useState,useEffect} from "react";
 import {View, Text,TouchableOpacity,Image,ScrollView,StyleSheet,ImageBackground,Modal,Dimensions} from "react-native"
-import MapView,{Marker} from "react-native-maps";
-import cusmapstyle from '../json/mapstyle.json'
-import { Button } from "react-native-elements";
-import LottieView from "lottie-react-native";
-import { AntDesign } from "@expo/vector-icons"
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import * as firebase from 'firebase'; 
 import { setheight, setWidth, setSptext } from '../component/ScreenUtil';
-import {Ionicons} from "@expo/vector-icons"
-import { color } from "react-native-reanimated";
 import moment from "moment";
 
 const devicewidth = Dimensions.get('window').width;
@@ -36,7 +28,6 @@ const BuyerFinishOrder = ({route,navigation}) =>{
 
     
     var Datetimestamp = moment(new Date(confirmtime*1000)).format('MM-DD HH:MM');
-    console.log(confirmtime);
 
    
     useEffect(() => {

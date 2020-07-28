@@ -92,7 +92,6 @@ const SigninScreen = ({navigation}) =>{
           setIsLogin(true);
           isignInsaveToAsyncStorage();
 
-          console.log(`itsme`);
         } catch (err1) {
           
             setError(err1.message);

@@ -53,6 +53,7 @@ const UnfinishorderScreen = ({navigation}) =>{
 
     const safefirebaseUnfinishShareorder = async () => {
         const firebaseFoodDetail = [];
+        try{
         
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("unfinish").once('value', function(snapshot) {
             if(snapshot.exists()){
@@ -80,6 +81,9 @@ const UnfinishorderScreen = ({navigation}) =>{
             }
             
         });
+    }catch(e){
+        console.log(e);
+    }
 
         
     }

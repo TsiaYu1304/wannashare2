@@ -117,7 +117,7 @@ const Add = ({route,navigation}) => {
         var snapshot =  ref.put(blob);
         const imgURL = await (await snapshot).ref.getDownloadURL();
 
-       console.log(`iid=${imgURL}`);
+       try{
        
         firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Shareorder").child("foodshop").child(iid).set({
             name:firebase.auth().currentUser.displayName,
@@ -131,7 +131,11 @@ const Add = ({route,navigation}) => {
             location:location,
             time:firebase.database.ServerValue.TIMESTAMP,
           });
+        }catch(e){
+            console.warn(e)
+        };
 
+        try{
           firebase.database().ref("Orders").child(iid
             
             ).set({
@@ -149,6 +153,10 @@ const Add = ({route,navigation}) => {
             time:firebase.database.ServerValue.TIMESTAMP,
 
           });
+
+        }catch(e){
+            console.warn(e);
+        }
 
           navigation.goBack();  
           navigation.navigate('HomePage');  

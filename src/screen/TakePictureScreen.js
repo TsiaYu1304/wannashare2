@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity,Modal ,Image, Dimensions,StyleSheet} from 
 import { Camera } from 'expo-camera';
 import {AntDesign,MaterialCommunityIcons} from "@expo/vector-icons"
 import { setheight, setWidth, setSptext ,scaleSize} from '../component/ScreenUtil';
-import { color } from 'react-native-reanimated';
+import * as ImagePicker  from 'expo-image-picker'
 
 const devicewidth = Dimensions.get('window').width;
 const deviceheight = Dimensions.get('window').height;
@@ -34,7 +34,6 @@ const TakepictureScreen = ({navigation}) =>{
   async function takePicture(){
       if(camRef){
           const data = await camRef.current.takePictureAsync();
-          console.log(data);
           setCapturePhoto(data);
       }
      setOpen(true);
@@ -48,6 +47,19 @@ const TakepictureScreen = ({navigation}) =>{
    setOpen(false);
 }
 
+let openImagePickerAsync = async () => {
+  let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+  if (permissionResult.granted === false) {
+    alert('Permission to access camera roll is required!');
+    return;
+  }
+
+  let pickerResult = await ImagePicker.launchImageLibraryAsync();
+  setCapturePhoto(pickerResult);
+  setOpen(true);
+}
+
   
   return (
     <View style={{ flex: 1 ,backgroundColor:'#fff'}}>
@@ -59,7 +71,7 @@ const TakepictureScreen = ({navigation}) =>{
       <Camera style={styles.CameraStyle} type={type} ref={camRef}/>
 
       <View style={styles.BtnView}>
-        <TouchableOpacity style={{marginRight:setWidth(50)}}>
+        <TouchableOpacity onPress={()=>openImagePickerAsync()} style={{marginRight:setWidth(50)}}>
         <Image
             source={require('../icon/album.png')}
             style={{width:setWidth(32),height:setheight(32)}}

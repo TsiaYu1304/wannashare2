@@ -147,14 +147,23 @@ const User = ({navigation}) => {
         xhr.open('Get',pickerResult.uri,true);
         xhr.send(null);
     });
+
+    try{
         const ref = firebase.storage().ref(firebase.auth().currentUser.uid)
         var snapshot =  ref.put(blob);
         const imgURL = await (await snapshot).ref.getDownloadURL();
+    }catch(e){
+        console.warn(e);
+    }
 
+    try{
 
     await firebase.auth().currentUser.updateProfile({
         photoURL:imgURL
     })
+    }catch(e){
+        console.warn(e);
+    }
 
   };
 
@@ -219,11 +228,14 @@ const User = ({navigation}) => {
         storefirebaseauth();
         },[]);
         const storefirebaseauth = () => {
+            try{
             firebase.auth().signInWithEmailAndPassword(user.email, user.password);
             setUser({...user,email:firebase.auth().currentUser.email})
             setUser({...user,name:firebase.auth().currentUser.displayName})
             setUser({...user,userphoto:firebase.auth().currentUser.photoURL})
-            console.log(`user photoURL=${user.email}`);
+            }catch(e){
+                console.warn(e);
+            }
         };
   
     useEffect(()=>{
@@ -237,17 +249,27 @@ const User = ({navigation}) => {
 
 
     const listenData = ()=>{
+        try{
         firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").on('child_added',function(data){
             readunFinishData();
         });
+        }catch(e){
+            console.warn(e);
+        };
+
+        try{
 
         firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").on('child_added',function(data){
             readFinishData();
         });
+        }catch(e){
+            console.warn(e);
+        }
     }
 
     const readFinishData = async () => {
         const FiniFoodDetail = [];
+        try{
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("finish").once('value', function(snapshot) {
             if(snapshot.exists()){
                 snapshot.forEach(function(childSnapshot) {
@@ -269,7 +291,10 @@ const User = ({navigation}) => {
             }else{
                 setFiniorder(false);
             }
-            });
+        });
+    }catch(e){
+        console.warn(e);
+    }
             
        
   
@@ -277,6 +302,7 @@ const User = ({navigation}) => {
 
     const readunFinishData = async () => {
         const FoodDetail = [];
+        try{
         await firebase.database().ref("Users").child(firebase.auth().currentUser.uid).child("Buyorder").child("unfinish").once('value', function(snapshot) {
             if(snapshot.exists()){
                 snapshot.forEach(function(childSnapshot) {
@@ -299,7 +325,10 @@ const User = ({navigation}) => {
             }else{
                 setOrder(false);
             }
-            });
+        });
+    }catch(e){
+        console.warn(e);
+    }
   
     };
 
